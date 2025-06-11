@@ -3,10 +3,10 @@ import logo from '../assets/Logo.png';
 const Footer = () => {
     return (
         <div className="bg-[#262627] w-full h-[208px]">
-            <div className="flex flex-col justify-center items-between p-8 gap-4">
-                <div className="flex items-center justify-between gap-4">
-                    <img src={logo} alt="logo" className="w-[154px] h-[48px]" />
-                    <div className="flex flex-col text-white">
+            <div className="flex flex-col justify-center  p-8 gap-4">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <img src={logo} alt="logo" className="w-[225px] h-[80px] mx-0" />
+                    <div className="flex flex-col items-end text-white w-full sm:w-auto">
                         <span className="font-bold">AIVAR INTL TECHNOLOGIES LIMITED</span>
                         <span>63-66 Hatton Garden</span>
                         <span>London, England, EC1N 8LE</span>
