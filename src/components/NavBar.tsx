@@ -1,5 +1,5 @@
 import { CgProfile } from "react-icons/cg";
-import logo from '../assets/logo.png';
+import logo from '../assets/Logo.png';
 function NavBar() {
   return (
     <div className='flex justify-between items-center p-4 bg-[#262627] text-black'>
