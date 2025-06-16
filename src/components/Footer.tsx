@@ -7,10 +7,10 @@ const Footer = () => {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <img src={logo} alt="logo" className="w-[225px] h-[80px] mx-0" />
                     <div className="flex flex-col items-end text-white w-full sm:w-auto">
-                        <span className="font-bold">AIVAR INTL TECHNOLOGIES LIMITED</span>
-                        <span>63-66 Hatton Garden</span>
-                        <span>London, England, EC1N 8LE</span>
-                    </div>
+                        <span className="footer-big-text">AIVAR INTL TECHNOLOGIES LIMITED</span>
+                        <span className="footer-small-text">63-66 Hatton Garden</span>
+                        <span className="footer-small-text">London, England, EC1N 8LE</span>
+                    </div>  
                 </div>
 
                 <div 
@@ -20,8 +20,8 @@ const Footer = () => {
                     }}
                 ></div>
 
-                <div className="w-full flex items-center justify-end underline">
-                    <span className="font-bold">Privacy Policy</span>
+                <div className="w-full flex items-center justify-end">
+                    <span className="policy-text">Privacy Policy</span>
                 </div>
             </div>
         </div>
