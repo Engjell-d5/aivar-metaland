@@ -42,7 +42,7 @@ const ChatInput = () => {
 
     return (
         <div className="w-full sm:w-auto font-bold text-white text-4xl">
-            <div className="w-full sm:w-[682px] bg-[#616061] rounded-[80px] sm:rounded-[40px] p-4 flex flex-col gap-3">
+            <div className="w-full bg-[#5c5d5d]  sm:w-[682px] rounded-[80px] sm:rounded-[40px] p-4 flex flex-col gap-3">
                 {chatHistory.length > 0 && chatModal && (
                     <>
                         <div className="flex justify-end">
@@ -89,7 +89,7 @@ const ChatInput = () => {
                         </svg>
                     </button>
 
-                    <div className="w-[100px] sm:w-[300px] flex flex-grow h-[56px] bg-[#d6d7d6] rounded-[32px] sm:rounded-[28px] items-center px-1 gap-2">
+                    <div className=" bg-white w-[100px] sm:w-[300px] flex flex-grow h-[56px] sm:bg-[#d6d7d6] rounded-[32px] sm:rounded-[28px] items-center px-1 gap-2">
                         <input 
                             type="text" 
                             className="px-3 flex-1 bg-transparent focus:outline-none text-black placeholder:font-bold placeholder:text-sm placeholder:text-[#141414]" 
