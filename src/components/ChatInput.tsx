@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 interface ChatHistory {
     role: string;
@@ -12,16 +12,32 @@ const ChatInput = () => {
     ]);
     const [chatModal, setChatModal] = useState(true);
     const [input, setInput] = useState("");
+    const chatContainerRef = useRef<HTMLDivElement>(null);
+
+    // Auto-scroll to bottom when new messages are added
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [chatHistory]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInput(e.target.value);
     }
 
-    const handleSubmit = () => {
-        if(input == '') return;
-        setChatModal(true);
-        setChatHistory([...chatHistory, {role: "user", content: input}]);
+    const handleErasure = () => {
+        setChatHistory([]);
+        setChatModal(false);
         setInput("");
+    }
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            if(input == '') return;
+            setChatModal(true);
+            setChatHistory([...chatHistory, {role: "user", content: input}]);
+            setInput("");
+        }
     }
 
     return (
@@ -36,19 +52,34 @@ const ChatInput = () => {
                                 </svg>
                             </button>
                         </div>
-                        {chatHistory.map((chat, index) => {
-                            const chatBubbleClass = chat.role === "user" ? "chat-bubble-user" : "chat-bubble-ai";
-                            const alignmentClass = chat.role === "user" ? "flex justify-end" : "flex justify-start";
-                            return(
-                                <div key={index} className={alignmentClass}>
-                                    <div className={chatBubbleClass}>
-                                        <span className={chat.role === "user" ? "chat-bubble-text-user" : "chat-bubble-text-ai"}>
-                                            {chat.content}
-                                        </span>
+                        <div 
+                            ref={chatContainerRef}
+                            className="max-h-130 overflow-y-auto flex flex-col gap-3 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-600"
+                        >
+                            {chatHistory.map((chat, index) => {
+                                const chatBubbleClass = chat.role === "user" ? "chat-bubble-user" : "chat-bubble-ai";
+                                const alignmentClass = chat.role === "user" ? "flex justify-end" : "flex justify-start";
+                                return(
+                                    <div key={index} className={alignmentClass}>
+                                        <div className={chatBubbleClass}>
+                                            <span 
+                                                className={chat.role === "user" ? "chat-bubble-text-user" : "chat-bubble-text-ai"}
+                                                style={{
+                                                    fontFamily: 'Outfit',
+                                                    fontWeight: 400,
+                                                    fontSize: '16px',
+                                                    lineHeight: '100%',
+                                                    letterSpacing: '0%',
+                                                    textAlign: 'center'
+                                                }}
+                                            >
+                                                {chat.content}
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
-                            )
-                        })}
+                                )
+                            })}
+                        </div>
                     </>
                 )}
                 <div className="flex justify-between items-center gap-2">
@@ -61,12 +92,21 @@ const ChatInput = () => {
                     <div className="w-[100px] sm:w-[300px] flex flex-grow h-[56px] bg-[#d6d7d6] rounded-[32px] sm:rounded-[28px] items-center px-1 gap-2">
                         <input 
                             type="text" 
-                            className="px-3 flex-1 bg-transparent focus:outline-none text-black text-sm font-normal placeholder:font-bold placeholder:text-sm placeholder:text-[#141414]" 
+                            className="px-3 flex-1 bg-transparent focus:outline-none text-black placeholder:font-bold placeholder:text-sm placeholder:text-[#141414]" 
+                            style={{
+                                fontFamily: 'Outfit',
+                                fontWeight: 400,
+                                fontSize: '16px',
+                                lineHeight: '100%',
+                                letterSpacing: '0%',
+                            }}
                             placeholder="Try Something like..." 
+                            value={input}
                             onChange={(e) => handleInputChange(e)}
+                            onKeyDown={handleKeyDown}
                         />
                         <div className="flex justify-end items-center">
-                            <button className="hidden bg-white rounded-full w-[48px] h-[48px] sm:flex justify-center items-center shadow-lg" onClick={() => handleSubmit()}>
+                            <button className="hidden bg-white rounded-full w-[48px] h-[48px] sm:flex justify-center items-center shadow-lg" onClick={() => handleErasure()}>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="24" width="24">
                                 <path fill="#000000" d="M7.5,5.6L5,7L6.4,4.5L5,2L7.5,3.4L10,2L8.6,4.5L10,7L7.5,5.6M19.5,15.4L22,14L20.6,16.5L22,19L19.5,17.6L17,19L18.4,16.5L17,14L19.5,15.4M22,2L20.6,4.5L22,7L19.5,5.6L17,7L18.4,4.5L17,2L19.5,3.4L22,2M13.34,12.78L15.78,10.34L13.66,8.22L11.22,10.66L13.34,12.78M14.37,7.29L16.71,9.63C17.1,10 17.1,10.65 16.71,11.04L5.04,22.71C4.65,23.1 4,23.1 3.63,22.71L1.29,20.37C0.9,20 0.9,19.35 1.29,18.96L12.96,7.29C13.35,6.9 14,6.9 14.37,7.29Z" />
                                 </svg>

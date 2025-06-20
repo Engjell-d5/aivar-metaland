@@ -16,7 +16,7 @@ const Footer = () => {
                 <div 
                     className="w-full h-[1px]"
                     style={{
-                        backgroundImage: 'repeating-linear-gradient(to right, white 0px, white 3px, transparent 3px, transparent 9px)'
+                        backgroundImage: 'repeating-linear-gradient(to right, white 0px, white 8px, transparent 8px, transparent 16px)'
                     }}
                 ></div>
 
