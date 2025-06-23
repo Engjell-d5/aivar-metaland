@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useConversation } from "@11labs/react";
 
 interface ChatHistory {
     role: string;
@@ -6,15 +7,57 @@ interface ChatHistory {
 }
 
 const ChatInput = () => {
-    const [chatHistory, setChatHistory] = useState<ChatHistory[]>([
-        { role: "user", content: "What if we approach this with a soft touch?" },
-        { role: "ai", content: "How about giving this a shot?" }
-    ]);
+    const [chatHistory, setChatHistory] = useState<ChatHistory[]>([]);
     const [chatModal, setChatModal] = useState(true);
     const [input, setInput] = useState("");
+    const [isVoiceActive, setIsVoiceActive] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
-    // Auto-scroll to bottom when new messages are added
+    const conversation = useConversation({
+        onConnect: () => {
+            console.log('Connected to ElevenLabs agent');
+            setError(null);
+        },
+        
+        onDisconnect: () => {
+            console.log('Disconnected from ElevenLabs agent');
+            setIsVoiceActive(false);
+        },
+        
+        onMessage: (message: { type?: string; text?: string; source?: string; message?: string; isFinal?: boolean; [key: string]: unknown }) => {
+            console.log('Message received:', message);
+            
+            if (message.source && message.message) {
+                const newMessage = {
+                    role: message.source === 'ai' ? 'ai' : 'user',
+                    content: message.message
+                };
+                
+                setChatHistory(prev => [...prev, newMessage]);
+                setChatModal(true);
+            }
+            
+            else if (message.type === 'agent_response' || message.type === 'transcription') {
+                const newMessage = {
+                    role: message.type === 'agent_response' ? 'ai' : 'user',
+                    content: message.text || ''
+                };
+                
+                setChatHistory(prev => [...prev, newMessage]);
+                setChatModal(true);
+            }
+        },
+        
+        onError: (err: any) => {
+            console.error('Error during conversation:', err);
+            setError(`Voice chat error: ${err.message || 'Unknown error'}`);
+            setIsVoiceActive(false);
+        }   
+    });
+
+    const { status, isSpeaking } = conversation;
+
     useEffect(() => {
         if (chatContainerRef.current) {
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
@@ -29,6 +72,10 @@ const ChatInput = () => {
         setChatHistory([]);
         setChatModal(false);
         setInput("");
+        if (isVoiceActive) {
+            conversation.endSession();
+            setIsVoiceActive(false);
+        }
     }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -40,9 +87,65 @@ const ChatInput = () => {
         }
     }
 
+    const toggleVoiceChat = async () => {
+        if (!isVoiceActive) {
+            try {
+                const agentId = import.meta.env.VITE_ELEVENLABS_AGENT_ID;
+                if (!agentId) {
+                    throw new Error('ElevenLabs Agent ID not found in environment variables');
+                }
+                
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                const dynamicVariables = {
+                    nome_utente: 'Utente',
+                    cliente_ecommerce: 'no',
+                    acquisti_recenti: 'nessuno',
+                    cliente_viaggi: 'no',
+                    cliente_giochi: 'no',
+                    giochi_preferiti: 'nessuno',
+                    ultima_visita: 'prima volta',
+                    cliente_finanza: 'no'
+                };
+                
+                console.log('Starting session with dynamic variables:', dynamicVariables);
+                
+                const conversationId = await conversation.startSession({ 
+                    agentId: agentId,
+                    dynamicVariables: dynamicVariables
+                });
+                
+                console.log('Conversation started with ID:', conversationId);
+                setIsVoiceActive(true);
+                setChatModal(true);
+                setError(null);
+            } catch (err: unknown) {
+                console.error('Error starting voice chat:', err);
+                const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+                setError(`Failed to start voice chat: ${errorMessage}`);
+                setIsVoiceActive(false);
+            }
+        } else {
+            conversation.endSession();
+            setIsVoiceActive(false);
+            setTimeout(() => {
+                if (!isVoiceActive) {
+                    setChatModal(false);
+                }
+            }, 2000);
+        }
+    };
+
     return (
         <div className="w-full sm:w-auto font-bold text-white text-4xl">
             <div className="w-full bg-[#5c5d5d]  sm:w-[682px] rounded-[80px] sm:rounded-[40px] p-4 flex flex-col gap-3">
+                {error && (
+                    <div className="bg-red-500 text-white p-2 rounded-lg mb-2 text-sm">
+                        <p>{error}</p>
+                        <button onClick={() => setError(null)} className="text-xs underline">Dismiss</button>
+                    </div>
+                )}
+                
                 {chatHistory.length > 0 && chatModal && (
                     <>
                         <div className="flex justify-end">
@@ -79,6 +182,15 @@ const ChatInput = () => {
                                     </div>
                                 )
                             })}
+                            {isSpeaking && (
+                                <div className="flex justify-start">
+                                    <div className="chat-bubble-ai">
+                                        <span className="chat-bubble-text-ai">
+                                            🎤 AI is speaking...
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </>
                 )}
@@ -114,10 +226,27 @@ const ChatInput = () => {
                         </div>
                     </div>
 
-                    <button className="bg-white rounded-[28px] w-[56px] h-[56px] flex justify-center items-center">
+                    <button 
+                        className={`rounded-[28px] w-[56px] h-[56px] flex justify-center items-center transition-all duration-200 ${
+                            isVoiceActive 
+                                ? 'bg-red-500 animate-pulse' 
+                                : status === 'connected' 
+                                    ? 'bg-green-500' 
+                                    : 'bg-white'
+                        }`}
+                        onClick={toggleVoiceChat}
+                        disabled={status === 'connecting'}
+                    >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" id="Ai-Spark-Microphone--Streamline-Outlined-Expansion" height="24" width="24">
                             <g id="ai-spark-microphone">
-                                <path id="Union" fill="#000000" fillRule="evenodd" d="M17 1.5c0 1.93296 -1.567 3.49991 -3.5 3.49991v2c1.933 0 3.5 1.56701 3.5 3.49999V10.5l1.0001 0 0.9999 0v-0.0001c0 -1.93298 1.567 -3.49999 3.5 -3.49999h0.0001v-2H22.5c-1.9329 0 -3.4999 -1.56695 -3.5 -3.49991h-2ZM5.875 14.125C6.45833 14.7083 7.16667 15 8 15c0.83333 0 1.54167 -0.2917 2.125 -0.875 0.5833 -0.5833 0.875 -1.2917 0.875 -2.125V6c0 -0.83333 -0.2917 -1.54167 -0.875 -2.125C9.54167 3.29167 8.83333 3 8 3c-0.83333 0 -1.54167 0.29167 -2.125 0.875C5.29167 4.45833 5 5.16667 5 6v6c0 0.8333 0.29167 1.5417 0.875 2.125ZM7 18.925V22h2v-3.075c1.7333 -0.2333 3.1667 -1.0083 4.3 -2.325 1.1333 -1.3167 1.7 -2.85 1.7 -4.6h-2c0 1.3833 -0.4875 2.5625 -1.4625 3.5375C10.5625 16.5125 9.38333 17 8 17s-2.5625 -0.4875 -3.5375 -1.4625C3.4875 14.5625 3 13.3833 3 12H1c0 1.75 0.56667 3.2833 1.7 4.6 1.13333 1.3167 2.56667 2.0917 4.3 2.325Zm1.7125 -6.2125C8.52083 12.9042 8.28333 13 8 13s-0.52083 -0.0958 -0.7125 -0.2875C7.09583 12.5208 7 12.2833 7 12V6c0 -0.28333 0.09583 -0.52083 0.2875 -0.7125C7.47917 5.09583 7.71667 5 8 5s0.52083 0.09583 0.7125 0.2875C8.90417 5.47917 9 5.71667 9 6v6c0 0.2833 -0.09583 0.5208 -0.2875 0.7125Z" clipRule="evenodd" strokeWidth="1"></path>
+                                <path 
+                                    id="Union" 
+                                    fill={isVoiceActive || status === 'connected' ? "#ffffff" : "#000000"} 
+                                    fillRule="evenodd" 
+                                    d="M17 1.5c0 1.93296 -1.567 3.49991 -3.5 3.49991v2c1.933 0 3.5 1.56701 3.5 3.49999V10.5l1.0001 0 0.9999 0v-0.0001c0 -1.93298 1.567 -3.49999 3.5 -3.49999h0.0001v-2H22.5c-1.9329 0 -3.4999 -1.56695 -3.5 -3.49991h-2ZM5.875 14.125C6.45833 14.7083 7.16667 15 8 15c0.83333 0 1.54167 -0.2917 2.125 -0.875 0.5833 -0.5833 0.875 -1.2917 0.875 -2.125V6c0 -0.83333 -0.2917 -1.54167 -0.875 -2.125C9.54167 3.29167 8.83333 3 8 3c-0.83333 0 -1.54167 0.29167 -2.125 0.875C5.29167 4.45833 5 5.16667 5 6v6c0 0.8333 0.29167 1.5417 0.875 2.125ZM7 18.925V22h2v-3.075c1.7333 -0.2333 3.1667 -1.0083 4.3 -2.325 1.1333 -1.3167 1.7 -2.85 1.7 -4.6h-2c0 1.3833 -0.4875 2.5625 -1.4625 3.5375C10.5625 16.5125 9.38333 17 8 17s-2.5625 -0.4875 -3.5375 -1.4625C3.4875 14.5625 3 13.3833 3 12H1c0 1.75 0.56667 3.2833 1.7 4.6 1.13333 1.3167 2.56667 2.0917 4.3 2.325Zm1.7125 -6.2125C8.52083 12.9042 8.28333 13 8 13s-0.52083 -0.0958 -0.7125 -0.2875C7.09583 12.5208 7 12.2833 7 12V6c0 -0.28333 0.09583 -0.52083 0.2875 -0.7125C7.47917 5.09583 7.71667 5 8 5s0.52083 0.09583 0.7125 0.2875C8.90417 5.47917 9 5.71667 9 6v6c0 0.2833 -0.09583 0.5208 -0.2875 0.7125Z" 
+                                    clipRule="evenodd" 
+                                    strokeWidth="1"
+                                />
                             </g>
                         </svg>
                     </button>
