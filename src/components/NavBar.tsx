@@ -23,7 +23,7 @@ function NavBar() {
     }, [languageModal]);
   return (
     <div className='flex justify-between items-center p-4 bg-[#262627] text-black relative'>
-        <img src={logo} alt="logo" className='w-[154px] h-[48px]' />
+        <img src={logo} alt="logo" style={{ width: '153.6px', height: '48px' }} />
         <div className='hidden sm:flex gap-4 text-white justify-center items-center'>
           <div className="relative" ref={languageModalRef}>
               <button onClick={() => setLanguageModal(!languageModal)} className='bg-[#244ff9] rounded-[24px] w-[40px] h-[40px] flex items-center justify-center'>
@@ -32,28 +32,278 @@ function NavBar() {
               </svg>
             </button>
             {languageModal && (
-                <div className="absolute top-12 -right-20 language-container">
-                    <div className="langugage-text-container">
-                        <div className="language-text">
-                            <div className="language-flag">🇬🇧</div>
-                            <span>English</span>
+                <div 
+                    className="absolute top-12 -right-20"
+                    style={{
+                        boxSizing: 'border-box',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        padding: '24px',
+                        gap: '12px',
+                        width: '180px',
+                        height: '136px',
+                        background: 'linear-gradient(0deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), linear-gradient(110.72deg, rgba(255, 255, 255, 0.581) 6.19%, rgba(255, 255, 255, 0.07) 90.27%)',
+                        backgroundBlendMode: 'normal, overlay',
+                        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.25)',
+                        backdropFilter: 'blur(12px)',
+                        borderRadius: '8px'
+                    }}
+                >
+                    <div 
+                        className="langugage-text-container"
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            padding: '0px',
+                            gap: '8px',
+                            width: '132px',
+                            height: '88px',
+                            borderRadius: '4px',
+                            flex: 'none',
+                            order: 0,
+                            alignSelf: 'stretch',
+                            flexGrow: 0
+                        }}
+                    >
+                        <div 
+                            className="language-text"
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                padding: '0px',
+                                gap: '8px',
+                                width: '132px',
+                                height: '24px',
+                                flex: 'none',
+                                order: 2,
+                                flexGrow: 0
+                            }}
+                        >
+                            <div 
+                                className="language-flag"
+                                style={{
+                                    width: '28px',
+                                    height: '20px',
+                                    borderRadius: '3px',
+                                    flex: 'none',
+                                    order: 0,
+                                    flexGrow: 0
+                                }}
+                            >
+                                <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <g clipPath="url(#clip0_114_756)">
+                                        <rect width="28" height="20" rx="3" fill="#1A47B8"/>
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M2.97863 0H0V3.33333L25.0052 20L28 20V16.6667L2.97863 0Z" fill="white"/>
+                                        <path d="M0.993465 0L28 18.0472V20H27.0298L0 1.93408V0H0.993465Z" fill="#F93939"/>
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M25.3333 1.52588e-05H28V3.33335C28 3.33335 10.6797 14.4374 2.66667 20H0V16.6667L25.3333 1.52588e-05Z" fill="white"/>
+                                        <path d="M28 0H27.0957L0 18.0628V20H0.993465L28 1.94868V0Z" fill="#F93939"/>
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M10.1828 0H17.8405V6.16909H28V13.8268H17.8405V20H10.1828V13.8268H0V6.16909H10.1828V0Z" fill="white"/>
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M11.7895 0H16.2105V7.69231H28V12.3077H16.2105V20H11.7895V12.3077H0V7.69231H11.7895V0Z" fill="#F93939"/>
+                                    </g>
+                                    <defs>
+                                        <clipPath id="clip0_114_756">
+                                            <rect width="28" height="20" rx="3" fill="white"/>
+                                        </clipPath>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <span 
+                                style={{
+                                    width: '96px',
+                                    height: '24px',
+                                    fontFamily: 'Figtree',
+                                    fontStyle: 'normal',
+                                    fontWeight: 600,
+                                    fontSize: '16px',
+                                    lineHeight: '24px',
+                                    color: '#272727',
+                                    flex: 'none',
+                                    order: 1,
+                                    flexGrow: 1
+                                }}
+                            >
+                                English
+                            </span>
                         </div>
-                        <div className="language-text">
-                            <div className="language-flag">🇮🇹</div>
-                            <span>Italian</span>
+                        <div 
+                            className="language-text"
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                padding: '0px',
+                                gap: '8px',
+                                width: '132px',
+                                height: '24px',
+                                flex: 'none',
+                                order: 2,
+                                flexGrow: 0
+                            }}
+                        >
+                            <div 
+                                className="language-flag"
+                                style={{
+                                    width: '28px',
+                                    height: '20px',
+                                    borderRadius: '3px',
+                                    flex: 'none',
+                                    order: 0,
+                                    flexGrow: 0
+                                }}
+                            >
+                                <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <g clipPath="url(#clip0_114_765)">
+                                        <rect width="28" height="20" rx="3" fill="white"/>
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M18.6667 0H28.0001V20H18.6667V0Z" fill="#F93939"/>
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M0 0H9.33333V20H0V0Z" fill="#249F58"/>
+                                    </g>
+                                    <defs>
+                                        <clipPath id="clip0_114_765">
+                                            <rect width="28" height="20" rx="3" fill="white"/>
+                                        </clipPath>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <span 
+                                style={{
+                                    width: '96px',
+                                    height: '24px',
+                                    fontFamily: 'Figtree',
+                                    fontStyle: 'normal',
+                                    fontWeight: 600,
+                                    fontSize: '16px',
+                                    lineHeight: '24px',
+                                    color: '#272727',
+                                    flex: 'none',
+                                    order: 1,
+                                    flexGrow: 1
+                                }}
+                            >
+                                Italian
+                            </span>
                         </div>
-                        <div className="language-text">
-                            <div className="language-flag">🇪🇸</div>
-                            <span>Spanish</span>
+                        <div 
+                            className="language-text"
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                padding: '0px',
+                                gap: '8px',
+                                width: '132px',
+                                height: '24px',
+                                flex: 'none',
+                                order: 2,
+                                flexGrow: 0
+                            }}
+                        >
+                            <div 
+                                className="language-flag"
+                                style={{
+                                    width: '28px',
+                                    height: '20px',
+                                    borderRadius: '3px',
+                                    flex: 'none',
+                                    order: 0,
+                                    flexGrow: 0
+                                }}
+                            >
+                                <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <g clipPath="url(#clip0_114_770)">
+                                        <rect width="28" height="20" rx="3" fill="#F93939"/>
+                                        <path d="M25.3333 0H2.66667C1.19391 0 0 1.19391 0 2.66667V17.3333C0 18.8061 1.19391 20 2.66667 20H25.3333C26.8061 20 28 18.8061 28 17.3333V2.66667C28 1.19391 26.8061 0 25.3333 0Z" fill="#F93939"/>
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M0 5.33333H28V14.6667H0V5.33333Z" fill="#FFDA2C"/>
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M11.9999 8.296V11.656C11.9999 12.5893 11.1039 13.336 9.99992 13.336H7.33325C6.23192 13.3333 5.33325 12.5827 5.33325 11.6533V8.29333C5.33325 7.53066 5.93059 6.89333 6.75192 6.68666C6.99992 5.99333 7.76259 6.61466 8.66659 6.61466C9.57592 6.61466 10.3333 5.99733 10.5813 6.688C11.3999 6.9 11.9999 7.53866 11.9999 8.296Z" fill="#D4AF2C"/>
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M12 9.33333H13.3333V13.3333H12V9.33333ZM4 9.33333H5.33333V13.3333H4V9.33333Z" fill="#CBCBCB"/>
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M12 12H13.3333V13.3333H12V12ZM4 12H5.33333V13.3333H4V12Z" fill="#1A47B8"/>
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M12 8H13.3333V9.33333H12V8ZM4 8H5.33333V9.33333H4V8Z" fill="#D4AF2C"/>
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M6.66675 8H8.00008V10H6.66675V8ZM9.33342 10.6667H10.6667V12.6667H9.33342V10.6667Z" fill="#AF010D"/>
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M6.66675 10.6667H8.00008V12.6667H6.66675V10.6667Z" fill="#FFDA2C"/>
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M9.33325 8H10.6666V10H9.33325V8Z" fill="#AE6A3E"/>
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M8.00008 8.00001L6.66675 6.66667H10.6667L9.33342 8.00001H8.00008Z" fill="#AF010D"/>
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M8 5.33333H9.33333V6.66666H8V5.33333Z" fill="#D4AF2C"/>
+                                    </g>
+                                    <defs>
+                                        <clipPath id="clip0_114_770">
+                                            <rect width="28" height="20" rx="3" fill="white"/>
+                                        </clipPath>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <span 
+                                style={{
+                                    width: '96px',
+                                    height: '24px',
+                                    fontFamily: 'Figtree',
+                                    fontStyle: 'normal',
+                                    fontWeight: 600,
+                                    fontSize: '16px',
+                                    lineHeight: '24px',
+                                    color: '#272727',
+                                    flex: 'none',
+                                    order: 1,
+                                    flexGrow: 1
+                                }}
+                            >
+                                Spanish
+                            </span>
                         </div>
                     </div>
                 </div>
             )}
           </div>
-            <button className='bg-[#244ff9] rounded-[24px] w-[106px] h-[40px] flex items-center justify-center nav-bar-button'> <span className="nav-bar-text">Space Station</span></button>
-            <button className='bg-white rounded-[24px]  w-[106px] h-[40px] flex justify-center items-center gap-2'>
-                <span className='text-[#004FF8] nav-bar-text'>Login</span>
-                <CgProfile color='#004FF8' size={20}/>
+            <button className='bg-[#244ff9] rounded-[24px] w-[106px] h-[40px] flex items-center justify-center nav-bar-button'> 
+                <span 
+                    className='text-[#E6EDFE]'
+                    style={{
+                        fontFamily: 'Figtree',
+                        fontStyle: 'normal',
+                        fontWeight: 600,
+                        fontSize: '16px',
+                        lineHeight: '24px',
+                        letterSpacing: '0.02em',
+                        color: '#E6EDFE',
+                        flex: 'none',
+                        order: 1,
+                        flexGrow: 0
+                    }}
+                >
+                    Space Station
+                </span>
+            </button>
+            <button className='bg-[#E6EDFE] rounded-[24px] w-[106px] h-[40px] flex justify-center items-center gap-2 px-4 py-2'>
+                <span 
+                    className='text-[#004FF8]'
+                    style={{
+                        width: '42px',
+                        height: '24px',
+                        fontFamily: 'Figtree',
+                        fontStyle: 'normal',
+                        fontWeight: 600,
+                        fontSize: '16px',
+                        lineHeight: '24px',
+                        letterSpacing: '0.02em',
+                        color: '#004FF8',
+                        flex: 'none',
+                        order: 1,
+                        flexGrow: 0
+                    }}
+                >
+                    Login
+                </span>
+                <CgProfile 
+                    color='#004FF8' 
+                    size={20}
+                    style={{
+                        flex: 'none',
+                        order: 0,
+                        flexGrow: 0
+                    }}
+                />
             </button>
         </div>
       <button onClick={() => setMenuModal(!menuModal)} className='sm:hidden bg-[#244ff9] rounded-[24px] p-2 w-[40px] h-[40px]'>
