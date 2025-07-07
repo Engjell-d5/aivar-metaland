@@ -38,15 +38,14 @@ text-align: right;
 
 .policy-text{
     font-family: Figtree;
-font-weight: 600;
-font-size: 16px;
-line-height: 24px;
-letter-spacing: 2%;
-text-align: right;
-text-decoration: underline;
-text-decoration-style: solid;
-text-decoration-offset: 0%;
-text-decoration-thickness: 0%;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 2%;
+  text-align: right;
+  text-decoration: underline;
+  text-decoration-style: solid;
+  text-decoration-thickness: 0%;
 }
 
 .language-text{
@@ -101,79 +100,4 @@ text-decoration-thickness: 0%;
     justify-content: center;
 }
 
-.chat-bubble-user{
-width: fit-content;
-max-width: 70%;
-padding-top: 18px;
-padding-right: 24px;
-padding-bottom: 18px;
-padding-left: 24px;
-border-top-left-radius: 32px;
-border-top-right-radius: 32px;
-border-bottom-left-radius: 32px;
-background: var(--Base-color-surface-base, #FFFFFF);
-box-shadow: 0px 1px 2px 0px #0000004D;
-box-shadow: 0px 1px 3px 1px #00000026;
-text-wrap: wrap;
-display: flex;
-justify-content: flex-end;
-}
-
-.chat-bubble-ai{
-width: fit-content;
-max-width: 70%;
-gap: 8px;
-padding-top: 18px;
-padding-right: 24px;
-padding-bottom: 18px;
-padding-left: 24px;
-border-top-left-radius: 32px;
-border-top-right-radius: 32px;
-border-bottom-right-radius: 32px;
-background: var(--Base-color-surface-base, #FFFFFF);
-box-shadow: 0px 1px 2px 0px #0000004D;
-box-shadow: 0px 1px 3px 1px #00000026;
-display: flex;
-justify-content: flex-start;
-text-wrap: wrap;
-}
-
-.chat-bubble-text-user{
-    font-family: Outfit;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 100%;
-    letter-spacing: 0%;
-    text-align: center;    
-    color: #141414;
-    text-wrap: wrap;
-    word-break: break-word;
-    overflow-wrap: break-word;
-}
-
-.chat-bubble-text-ai{
-    font-family: Outfit;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 100%;
-    letter-spacing: 0%;
-    text-align: center;    
-    color: #141414;
-    word-break: break-word;
-    overflow-wrap: break-word;
-}
-
-.chat-close-button{
-width: 56px;
-height: 56px;
-gap: 8px;
-border-radius: 28px;
-padding: 12px;
-background: var(--Base-color-surface-alt-var, #F6F6F6);
-box-shadow: 0px 1px 2px 0px #0000004D;
-box-shadow: 0px 1px 3px 1px #00000026;
-display: flex;
-justify-content: center;
-align-items: center;
-
-}
+/* Chat-related styles have been moved to ChatInput.css */

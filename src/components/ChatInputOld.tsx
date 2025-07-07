@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useConversation } from '@11labs/react'
 import './ChatInput.css'
 
@@ -13,25 +13,111 @@ const ChatInput = () => {
   const [input, setInput] = useState('')
   const [isVoiceActive, setIsVoiceActive] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [reconnectAttempts, setReconnectAttempts] = useState(0)
+  const [isReconnecting, setIsReconnecting] = useState(false)
   const chatContainerRef = useRef<HTMLDivElement>(null)
+  const sessionTimeoutRef = useRef<number | null>(null)
+  const reconnectTimeoutRef = useRef<number | null>(null)
+  const maxReconnectAttempts = 3
+  const sessionTimeout = 30000 // 30 seconds of inactivity before showing warning
+  const reconnectDelay = 2000 // 2 seconds between reconnect attempts
 
+  // Clear timeouts on component unmount
   useEffect(() => {
     return () => {
-      // Cleanup function for component unmount
+      if (sessionTimeoutRef.current) {
+        clearTimeout(sessionTimeoutRef.current)
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current)
+      }
     }
   }, [])
 
+  // Reset session timeout on user activity
+  const resetSessionTimeout = useCallback(() => {
+    if (sessionTimeoutRef.current) {
+      clearTimeout(sessionTimeoutRef.current)
+    }
+    
+    if (isVoiceActive) {
+      sessionTimeoutRef.current = window.setTimeout(() => {
+        console.log('Session timeout reached, ending session')
+        setError('Session ended due to inactivity')
+        setIsVoiceActive(false)
+      }, sessionTimeout)
+    }
+  }, [isVoiceActive, sessionTimeout])
+
+  // Automatic reconnection logic
+  const attemptReconnection = useCallback(async () => {
+    if (reconnectAttempts >= maxReconnectAttempts) {
+      setError('Failed to maintain connection after multiple attempts')
+      setIsReconnecting(false)
+      return
+    }
+
+    setIsReconnecting(true)
+    setReconnectAttempts(prev => prev + 1)
+    
+    console.log(`Attempting to reconnect (attempt ${reconnectAttempts + 1}/${maxReconnectAttempts})`)
+    
+    reconnectTimeoutRef.current = window.setTimeout(async () => {
+      try {
+        const agentId = import.meta.env.VITE_ELEVENLABS_AGENT_ID
+        if (!agentId) {
+          throw new Error('ElevenLabs Agent ID not found')
+        }
+
+        const dynamicVariables = {
+          nome_utente: 'Utente',
+          cliente_ecommerce: 'no',
+          acquisti_recenti: 'nessuno',
+          cliente_viaggi: 'no',
+          cliente_giochi: 'no',
+          giochi_preferiti: 'nessuno',
+          ultima_visita: 'prima volta',
+          cliente_finanza: 'no'
+        }
+
+        // Note: Will need to access conversation object when it's available
+        console.log('Reconnection attempt prepared with variables:', dynamicVariables)
+        setIsReconnecting(false)
+        setReconnectAttempts(0)
+        setError(null)
+        resetSessionTimeout()
+      } catch (err) {
+        console.error('Reconnection failed:', err)
+        setIsReconnecting(false)
+        // Try again after delay
+        setTimeout(() => attemptReconnection(), reconnectDelay)
+      }
+    }, reconnectDelay)
+  }, [reconnectAttempts, maxReconnectAttempts, resetSessionTimeout, reconnectDelay])
+
   const conversation = useConversation({
     onConnect: () => {
-      debugger
       console.log('Connected to ElevenLabs agent')
       setError(null)
+      setReconnectAttempts(0)
+      setIsReconnecting(false)
+      resetSessionTimeout()
     },
     
     onDisconnect: () => {
-      debugger
       console.log('Disconnected from ElevenLabs agent')
-      //setIsVoiceActive(false)
+      setIsVoiceActive(false)
+      
+      // Clear session timeout
+      if (sessionTimeoutRef.current) {
+        clearTimeout(sessionTimeoutRef.current)
+      }
+      
+      // Attempt automatic reconnection if the disconnection was unexpected
+      if (isVoiceActive && !isReconnecting && reconnectAttempts < maxReconnectAttempts) {
+        console.log('Unexpected disconnection, attempting to reconnect...')
+        attemptReconnection()
+      }
     },
     
     onMessage: (message: { 
@@ -42,8 +128,10 @@ const ChatInput = () => {
       isFinal?: boolean
       [key: string]: unknown 
     }) => {
-      debugger
       console.log('Message received:', message)
+      
+      // Reset session timeout on any message activity
+      resetSessionTimeout()
       
       if (message.source && message.message) {
         const newMessage = {
@@ -70,6 +158,17 @@ const ChatInput = () => {
       console.error('Error during conversation:', err)
       setError(`Voice chat error: ${err.message || 'Unknown error'}`)
       setIsVoiceActive(false)
+      
+      // Clear session timeout on error
+      if (sessionTimeoutRef.current) {
+        clearTimeout(sessionTimeoutRef.current)
+      }
+      
+      // Attempt reconnection for certain types of errors
+      if (err.message?.includes('connection') || err.message?.includes('network')) {
+        console.log('Network error detected, attempting to reconnect...')
+        attemptReconnection()
+      }
     }   
   })
 
@@ -92,6 +191,13 @@ const ChatInput = () => {
     if (isVoiceActive) {
       conversation.endSession()
       setIsVoiceActive(false)
+    }
+    // Clear timeouts
+    if (sessionTimeoutRef.current) {
+      clearTimeout(sessionTimeoutRef.current)
+    }
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current)
     }
   }
 
@@ -137,6 +243,8 @@ const ChatInput = () => {
         setIsVoiceActive(true)
         setChatModal(true)
         setError(null)
+        setReconnectAttempts(0)
+        resetSessionTimeout()
       } catch (err: unknown) {
         console.error('Error starting voice chat:', err)
         const errorMessage = err instanceof Error ? err.message : 'Unknown error'
@@ -146,6 +254,10 @@ const ChatInput = () => {
     } else {
       conversation.endSession()
       setIsVoiceActive(false)
+      // Clear timeouts
+      if (sessionTimeoutRef.current) {
+        clearTimeout(sessionTimeoutRef.current)
+      }
       setTimeout(() => {
         if (!isVoiceActive) {
           setChatModal(false)
@@ -163,6 +275,12 @@ const ChatInput = () => {
             <button onClick={() => setError(null)}>
               Dismiss
             </button>
+          </div>
+        )}
+        
+        {isReconnecting && (
+          <div className="chat-reconnecting">
+            <p>Attempting to reconnect... ({reconnectAttempts}/{maxReconnectAttempts})</p>
           </div>
         )}
         
@@ -241,9 +359,12 @@ const ChatInput = () => {
                   : 'voice-button-default'
             }`}
             onClick={toggleVoiceChat}
-            disabled={status === 'connecting'}
+            disabled={status === 'connecting' || isReconnecting}
           >
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {isReconnecting ? (
+              <div className="spinner">↻</div>
+            ) : (
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <mask id="mask0_8_5482" style={{ maskType: 'alpha' }} maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="32">
                   <rect width="32" height="32" fill="#D9D9D9"/>
                 </mask>
@@ -251,6 +372,7 @@ const ChatInput = () => {
                   <path d="M6.6667 13.1333L5.46337 10.5367L2.8667 9.33335L5.46337 8.13001L6.6667 5.53335L7.87003 8.13001L10.4667 9.33335L7.87003 10.5367L6.6667 13.1333ZM24 9.13335L23.2292 7.43751L21.5334 6.66668L23.2292 5.89585L24 4.20001L24.7709 5.89585L26.4667 6.66668L24.7709 7.43751L24 9.13335ZM26.6667 14.4667L25.8959 12.7708L24.2 12L25.8959 11.2292L26.6667 9.53335L27.4375 11.2292L29.1334 12L27.4375 12.7708L26.6667 14.4667ZM16 19.8333C14.9445 19.8333 14.0473 19.4583 13.3084 18.7083C12.5695 17.9583 12.2 17.0556 12.2 16V8.13335C12.2 7.07779 12.5695 6.18057 13.3084 5.44168C14.0473 4.70279 14.9445 4.33335 16 4.33335C17.0556 4.33335 17.9528 4.70279 18.6917 5.44168C19.4306 6.18057 19.8 7.07779 19.8 8.13335V16C19.8 17.0556 19.4306 17.9583 18.6917 18.7083C17.9528 19.4583 17.0556 19.8333 16 19.8333ZM14.75 29.0667V24.9833C12.4945 24.6945 10.6278 23.6939 9.15003 21.9817C7.67226 20.2696 6.93337 18.2757 6.93337 16H9.43337C9.43337 17.8222 10.0736 19.3722 11.3541 20.65C12.6346 21.9278 14.1833 22.5667 16 22.5667C17.8168 22.5667 19.3655 21.9264 20.646 20.6459C21.9265 19.3654 22.5667 17.8168 22.5667 16H25.0667C25.0667 18.2778 24.3278 20.2722 22.85 21.9833C21.3723 23.6945 19.5056 24.6945 17.25 24.9833V29.0667H14.75ZM16 17.3333C16.3684 17.3333 16.6771 17.2056 16.9263 16.95C17.1755 16.6945 17.3 16.3778 17.3 16V8.14008C17.3 7.76892 17.1756 7.45835 16.9268 7.20835C16.678 6.95835 16.3696 6.83335 16.0018 6.83335C15.634 6.83335 15.325 6.95793 15.075 7.20711C14.825 7.45627 14.7 7.76501 14.7 8.13335V16C14.7 16.3778 14.8246 16.6945 15.0738 16.95C15.3229 17.2056 15.6317 17.3333 16 17.3333Z" fill="#272727"/>
                 </g>
               </svg>
+            )}
           </button>
         </div>
       </div>

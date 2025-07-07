@@ -1,0 +1,51 @@
+# Proper MIME type for all files
+<IfModule mod_mime.c>
+  # CSS
+  AddType text/css .css
+
+  # JavaScript
+  AddType application/javascript .js
+
+  # SVG
+  AddType image/svg+xml .svg
+  AddType image/svg+xml .svgz
+  AddEncoding gzip .svgz
+
+  # Fonts
+  AddType font/woff .woff
+  AddType font/woff2 .woff2
+  AddType application/vnd.ms-fontobject .eot
+  AddType font/ttf .ttf
+  AddType font/collection .ttc
+  AddType font/otf .otf
+</IfModule>
+
+# Set Cache-Control header
+<IfModule mod_headers.c>
+  # 1 YEAR
+  <FilesMatch "\.(woff2|woff|ttf|ttc|otf|eot)$">
+    Header set Cache-Control "max-age=31536000, public"
+  </FilesMatch>
+
+  # 1 MONTH
+  <FilesMatch "\.(js|css|svg|svgz)$">
+    Header set Cache-Control "max-age=2592000, public"
+  </FilesMatch>
+</IfModule>
+
+# Enable CORS for fonts
+<IfModule mod_headers.c>
+  <FilesMatch "\.(ttf|ttc|otf|eot|woff|woff2|svg|svgz|css|js)$">
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
+</IfModule>
+
+# SPA redirect - for React Router
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
