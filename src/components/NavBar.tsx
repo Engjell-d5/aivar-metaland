@@ -66,10 +66,10 @@ function NavBar() {
 
 
   return (
-    <div className="navbar-container">
+    <div className="navbar-container relative z-[100]">
       <img src={logo} alt="logo" className="navbar-logo" />
-      <div className="navbar-desktop-menu">
-        <div className="language-selector" ref={languageModalRef}>
+      <div className="navbar-desktop-menu overflow-visible">
+        <div className="language-selector relative" ref={languageModalRef}>
           <button 
             onClick={() => setLanguageModal(!languageModal)} 
             className="language-button"
@@ -79,7 +79,7 @@ function NavBar() {
             </svg>
           </button>
           {languageModal && (
-            <div className="language-modal">
+            <div className="language-modal absolute top-full right-0 mt-2 !z-10">
               <div className="language-text-container">
                 <div className="language-item" onClick={() => handleLanguageSelect('English')}>
                   <div className="language-flag">

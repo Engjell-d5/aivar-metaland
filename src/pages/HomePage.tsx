@@ -142,7 +142,7 @@ const HomePage = () => {
     // First row
     <motion.div className="flex gap-8 justify-center items-center h-[calc(100vh-72px-250px)]" key="row1" style={gpuStyles}>
       <div className="flex gap-8">
-        <div className="translate-y-[-150px]">
+        <div className="p-5 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_-0.25))]">
           <Tile
             title="AI SHARING"
             iconPath="/images/logo1.png"
@@ -151,7 +151,7 @@ const HomePage = () => {
             right='0px'
           />
         </div>
-        <div className="translate-y-[-70px]">
+        <div className="p-5 pb-8 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_0.15))]">
           <Tile
             title="AIVAR STORE"
             iconPath="/images/logo2.png"
@@ -165,7 +165,7 @@ const HomePage = () => {
     // Second row
     <motion.div className="flex gap-8 justify-center items-center h-[calc(100vh-72px-250px)]" key="row2" style={gpuStyles}>
       <div className="flex gap-8">
-        <div className="translate-y-[-150px]">
+        <div className="p-5 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_-0.25))]">
           <Tile
             title="AIVAR METALAND"
             iconPath="/images/logo3.png"
@@ -174,7 +174,7 @@ const HomePage = () => {
             right='0px'
           />
         </div>
-        <div className="translate-y-[-70px]">
+        <div className="p-5 pb-8 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_0.15))]">
           <Tile
             title="CFX QUANTUM"
             iconPath="/images/logo4.png"
@@ -187,7 +187,7 @@ const HomePage = () => {
     </motion.div>,
     // Last row - single tile centered
     <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row3" style={gpuStyles}>
-      <div className="translate-y-[-80px]">
+      <div className="p-5 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_-0.2))]">
         <Tile
           title="VAFFA GAME"
           iconPath="/images/logo5.png"
@@ -216,7 +216,7 @@ const HomePage = () => {
           style={{
             top: '72px',
             width: '100%',
-            height: 'calc(100vh - 72px - 250px)',
+            height: 'calc(100vh - 72px - 250px)', // Available space between header and chat input
             perspective: '1000px',
             ...gpuStyles
           }}
