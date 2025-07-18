@@ -1,31 +1,153 @@
 import ChatInput from '../components/ChatInput'
 import Spline from '@splinetool/react-spline'
 import Tile from '../components/Tile'
-import { motion, useScroll, useTransform } from 'framer-motion'
-import { useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import type { Variants } from 'framer-motion'
+import { useRef, useState, useEffect } from 'react'
 import './HomePage.css'
 import Footer from '../components/Footer'
 
 const HomePage = () => {
   const containerRef = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"]
-  })
+  const [currentRowIndex, setCurrentRowIndex] = useState(0)
+  const [isAnimating, setIsAnimating] = useState(false)
+  const [direction, setDirection] = useState(0)
+  const lastScrollTime = useRef(Date.now())
+  const scrollThreshold = 50
+  const scrollCooldown = 800
 
-  // Calculate container height and row spacing
-  const containerHeight = 'calc(100vh - 328px)'
-  const rowSpacing = 'calc((100vh - 328px) * 2)' // 2x container height
+  // Animation variants for rows
+  const rowVariants: Variants = {
+    // Current row fading out
+    exit: {
+      opacity: 0,
+      transition: {
+        duration: 0.3
+      }
+    },
+    // New row entering
+    enter: (direction: number) => ({
+      y: direction > 0 ? '100vh' : '-100vh',
+      opacity: 1
+    }),
+    // Row in view
+    center: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        type: "spring" as const,
+        stiffness: 300,
+        damping: 30
+      }
+    }
+  }
 
-  // Adjust scroll ranges for better visibility - one range per row
-  const firstRowOpacity = useTransform(scrollYProgress, [0, 0.15], [0, 1])
-  const firstRowY = useTransform(scrollYProgress, [0, 0.15], [100, 0])
-  
-  const secondRowOpacity = useTransform(scrollYProgress, [0.3, 0.45], [0, 1])
-  const secondRowY = useTransform(scrollYProgress, [0.3, 0.45], [100, 0])
-  
-  const lastRowOpacity = useTransform(scrollYProgress, [0.6, 0.75], [0, 1])
-  const lastRowY = useTransform(scrollYProgress, [0.6, 0.75], [100, 0])
+  const handleWheel = (event: WheelEvent) => {
+    event.preventDefault()
+    
+    if (isAnimating) return
+    
+    const now = Date.now()
+    if (now - lastScrollTime.current < scrollCooldown) return
+    
+    const scrollDelta = event.deltaY
+    if (Math.abs(scrollDelta) < scrollThreshold) return
+
+    const isScrollingDown = scrollDelta > 0
+
+    // Handle scroll logic based on current row and direction
+    if (currentRowIndex === 0) {
+      // At first row, only allow scrolling down
+      if (isScrollingDown) {
+        setDirection(1)
+        setIsAnimating(true)
+        lastScrollTime.current = now
+        setCurrentRowIndex(1)
+      }
+    } 
+    else if (currentRowIndex === 1) {
+      // At second row, allow both directions
+      if (isScrollingDown) {
+        setDirection(1)
+        setIsAnimating(true)
+        lastScrollTime.current = now
+        setCurrentRowIndex(2)
+      } else {
+        setDirection(-1)
+        setIsAnimating(true)
+        lastScrollTime.current = now
+        setCurrentRowIndex(0)
+      }
+    }
+    else if (currentRowIndex === 2) {
+      // At last row, only allow scrolling up
+      if (!isScrollingDown) {
+        setDirection(-1)
+        setIsAnimating(true)
+        lastScrollTime.current = now
+        setCurrentRowIndex(1)
+      }
+    }
+  }
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    container.addEventListener('wheel', handleWheel, { passive: false })
+    return () => {
+      container.removeEventListener('wheel', handleWheel)
+    }
+  }, [currentRowIndex, isAnimating])
+
+  // Row content data
+  const rows = [
+    // First row
+    <div className="flex gap-8 justify-center" key="row1">
+      <Tile
+        title="AI SHARING"
+        iconPath="/images/logo1.png"
+        imagePath="/images/tile1.png"
+        top="0px"
+        right='0px'
+      />
+      <Tile
+        title="AIVAR STORE"
+        iconPath="/images/logo2.png"
+        imagePath="/images/tile2.png"
+        top="0px"
+        right='0px'
+      />
+    </div>,
+    // Second row
+    <div className="flex gap-8 justify-center" key="row2">
+      <Tile
+        title="AIVAR METALAND"
+        iconPath="/images/logo3.png"
+        imagePath="/images/tile3.png"
+        top="0px"
+        right='0px'
+      />
+      <Tile
+        title="CFX QUANTUM"
+        iconPath="/images/logo4.png"
+        imagePath="/images/tile4.png"
+        top="0px"
+        right='0px'
+      />
+    </div>,
+    // Last row
+    <div className="flex justify-center w-full max-w-[600px] mx-auto" key="row3">
+      <Tile
+        title="VAFFA GAME"
+        iconPath="/images/logo5.png"
+        imagePath="/images/tile5.png"
+        top="0px"
+        right='0px'
+      />
+    </div>
+  ]
 
   return (
     <div className="w-full h-screen overflow-hidden">
@@ -36,108 +158,38 @@ const HomePage = () => {
           scene="https://prod.spline.design/U4pluEHM1r2eie-d/scene.splinecode"
         />
         
-        {/* Tiles positioned as in Figma - highest z-index */}
+        {/* Tiles container */}
         <div 
           ref={containerRef}
           id='tiles-container' 
-          className="absolute inset-x-0 z-40 flex flex-col items-center hide-scrollbar px-4" 
+          className="absolute inset-x-0 z-40 flex flex-col items-center px-4" 
           style={{
             top: '60px',
             width: '100%',
-            height: containerHeight,
-            perspective: '1000px',
-            overflow: 'auto',
-            gap: rowSpacing
+            height: 'calc(100vh - 328px)',
+            perspective: '1000px'
           }}
         >
-          <div 
-            className="relative w-full flex flex-col items-center"
-            style={{ 
-              height: 'calc(100vh * 6)', // Increased to accommodate larger spacing
-              gap: rowSpacing
-            }}
-          >
-            {/* First Row - Two Tiles */}
-            <motion.div 
-              className="flex gap-8 justify-center w-full"
-              style={{ 
-                opacity: firstRowOpacity,
-                y: firstRowY,
-                position: 'fixed',
-                top: '60px',
-                left: '0',
-                right: '0'
-              }}
-              initial={{ opacity: 0, y: 100 }}
+          {/* Animation container */}
+          <div className="relative w-full h-full">
+            <AnimatePresence
+              initial={false}
+              mode="wait"
+              custom={direction}
+              onExitComplete={() => setIsAnimating(false)}
             >
-              <Tile
-                title="AI SHARING"
-                iconPath="/images/logo1.png"
-                imagePath="/images/tile1.png"
-                top="0px"
-                right='0px'
-              />
-              <Tile
-                title="AIVAR STORE"
-                iconPath="/images/logo2.png"
-                imagePath="/images/tile2.png"
-                top="0px"
-                right='0px'
-              />
-            </motion.div>
-
-            {/* Second Row - Two Tiles */}
-            <motion.div 
-              className="flex gap-8 justify-center w-full"
-              style={{ 
-                opacity: secondRowOpacity,
-                y: secondRowY,
-                position: 'fixed',
-                top: `calc(60px + ${rowSpacing})`,
-                left: '0',
-                right: '0'
-              }}
-              initial={{ opacity: 0, y: 100 }}
-            >
-              <Tile
-                title="AIVAR METALAND"
-                iconPath="/images/logo3.png"
-                imagePath="/images/tile3.png"
-                top="0px"
-                right='0px'
-              />
-              <Tile
-                title="CFX QUANTUM"
-                iconPath="/images/logo4.png"
-                imagePath="/images/tile4.png"
-                top="0px"
-                right='0px'
-              />
-            </motion.div>
-
-            {/* Last Row - Single Centered Tile */}
-            <motion.div 
-              className="flex justify-center w-full"
-              style={{ 
-                opacity: lastRowOpacity,
-                y: lastRowY,
-                position: 'fixed',
-                top: `calc(60px + (${rowSpacing} * 2))`,
-                left: '0',
-                right: '0'
-              }}
-              initial={{ opacity: 0, y: 100 }}
-            >
-              <div className="flex justify-center w-full max-w-[600px] mx-auto">
-                <Tile
-                  title="VAFFA GAME"
-                  iconPath="/images/logo5.png"
-                  imagePath="/images/tile5.png"
-                  top="0px"
-                  right='0px'
-                />
-              </div>
-            </motion.div>
+              <motion.div
+                key={currentRowIndex}
+                custom={direction}
+                variants={rowVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="absolute w-full"
+              >
+                {rows[currentRowIndex]}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
       </div>
