@@ -1,0 +1,97 @@
+/* Hide scrollbar */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+/* Fixed header and footer styles */
+.fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  min-height: 72px;
+  max-height: 72px;
+  z-index: 10; /* Lower z-index */
+  background-color: #262627;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: visible;
+  isolation: isolate;
+  contain: layout size;
+  clip: rect(0, 100vw, 72px, 0);
+}
+
+.fixed-header > * {
+  height: 72px;
+  min-height: 72px;
+  max-height: 72px;
+  overflow: visible;
+  contain: layout style;
+}
+
+.fixed-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 208px;
+  min-height: 208px;
+  max-height: 208px;
+  z-index: 10; /* Lower z-index */
+  background-color: #262627;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+  contain: layout size;
+}
+
+.fixed-footer > * {
+  height: 208px;
+  min-height: 208px;
+  max-height: 208px;
+  overflow: hidden;
+  contain: layout style;
+}
+
+.fixed-chat {
+  position: fixed;
+  bottom: 218px;
+  left: 0;
+  right: 0;
+  z-index: 20; /* Medium z-index */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.content-container {
+  position: fixed;
+  top: 72px;
+  left: 0;
+  right: 0;
+  bottom: 208px;
+  overflow: hidden;
+}
+
+/* Tiles container specific styles */
+#tiles-container {
+  z-index: 40 !important; /* Highest z-index */
+}
+
+/* Hide all scrollbars globally */
+::-webkit-scrollbar {
+  display: none !important;
+}
+
+* {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+} 

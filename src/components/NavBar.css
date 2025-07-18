@@ -8,11 +8,22 @@
   background-color: #262627;
   color: black;
   position: relative;
+  height: 72px;
+  min-height: 72px;
+  max-height: 72px;
+  box-sizing: border-box;
+  transform: translateZ(0);
+  will-change: transform;
+  overflow: hidden;
+  isolation: isolate;
+  contain: strict;
+  clip: rect(0, 100vw, 72px, 0);
 }
 
 .navbar-logo {
   width: 153.6px;
   height: 48px;
+  flex-shrink: 0;
 }
 
 .navbar-desktop-menu {
@@ -21,6 +32,7 @@
   color: white;
   justify-content: center;
   align-items: center;
+  height: 100%;
 }
 
 @media (min-width: 640px) {
@@ -31,6 +43,9 @@
 
 .language-selector {
   position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .language-button {
@@ -43,12 +58,15 @@
   justify-content: center;
   border: none;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
+/* Position dropdowns using fixed positioning */
 .language-modal {
-  position: absolute;
-  top: 48px;
-  right: -65px;
+  position: fixed;
+  top: 72px; /* Align with bottom of navbar */
+  left: 50%;
+  transform: translateX(-50%);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -205,8 +223,9 @@
   }
 }
 
+/* Ensure mobile menu appears above but doesn't affect container height */
 .mobile-menu-overlay {
-  position: absolute;
+  position: fixed;
   top: 72px;
   left: 0;
   width: 100%;
