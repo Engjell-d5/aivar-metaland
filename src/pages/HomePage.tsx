@@ -151,7 +151,7 @@ const HomePage = () => {
             right='0px'
           />
         </div>
-        <div className="p-5 pb-8 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_0.15))]">
+        <div className="p-5 pb-8 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_0.01))]">
           <Tile
             title="AIVAR STORE"
             iconPath="/images/logo2.png"
@@ -174,7 +174,7 @@ const HomePage = () => {
             right='0px'
           />
         </div>
-        <div className="p-5 pb-8 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_0.15))]">
+        <div className="p-5 pb-8 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_0.01))]">
           <Tile
             title="CFX QUANTUM"
             iconPath="/images/logo4.png"
