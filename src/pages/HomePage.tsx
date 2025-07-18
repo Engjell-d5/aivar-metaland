@@ -23,15 +23,18 @@ const HomePage = () => {
       opacity: 0,
       scale: 0.98,
       filter: 'blur(0px)',
+      y: 0,
       transition: {
-        duration: 0.2,
-        ease: "easeOut"
+        duration: 0.3,
+        ease: "easeInOut",
+        opacity: { duration: 0.2 },
+        scale: { duration: 0.2 }
       }
     },
     // New row entering
     enter: (direction: number) => ({
       y: direction > 0 ? '100vh' : '-100vh',
-      opacity: 1,
+      opacity: 0,
       scale: 1.02,
       filter: 'blur(0px)'
     }),
@@ -44,17 +47,20 @@ const HomePage = () => {
       transition: {
         y: {
           type: "spring",
-          stiffness: 100,
+          stiffness: 80,
           damping: 20,
           mass: 0.8,
           bounce: 0.2,
-          duration: 0.8
+          restDelta: 0.001,
+          restSpeed: 0.001
         },
         opacity: {
-          duration: 0.2
+          duration: 0.4,
+          ease: "easeOut"
         },
         scale: {
-          duration: 0.2
+          duration: 0.4,
+          ease: "easeOut"
         }
       }
     }
@@ -66,10 +72,11 @@ const HomePage = () => {
     backfaceVisibility: 'hidden' as const,
     WebkitFontSmoothing: 'antialiased',
     WebkitBackfaceVisibility: 'hidden' as const,
-    WebkitTransform: 'translateZ(0) scale3d(1, 1, 1)',
-    transform: 'translateZ(0) scale3d(1, 1, 1)',
+    WebkitTransform: 'translateZ(0)',
+    transform: 'translateZ(0)',
     WebkitPerspective: 1000,
-    isolation: 'isolate' as const
+    isolation: 'isolate' as const,
+    transformStyle: 'preserve-3d' as const
   }
 
   // GPU optimization styles with vertical centering
@@ -232,7 +239,9 @@ const HomePage = () => {
               initial={false}
               mode="wait"
               custom={direction}
-              onExitComplete={() => setIsAnimating(false)}
+              onExitComplete={() => {
+                setIsAnimating(false)
+              }}
             >
               <motion.div
                 key={currentRowIndex}
