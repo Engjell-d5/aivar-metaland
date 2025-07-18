@@ -79,18 +79,6 @@ const HomePage = () => {
     transformStyle: 'preserve-3d' as const
   }
 
-  // GPU optimization styles with vertical centering
-  const combinedGpuStyles = {
-    willChange: 'transform, opacity',
-    backfaceVisibility: 'hidden' as const,
-    WebkitFontSmoothing: 'antialiased',
-    WebkitBackfaceVisibility: 'hidden' as const,
-    WebkitTransform: 'translateZ(0) scale3d(1, 1, 1) translateY(-50%)',
-    transform: 'translateZ(0) scale3d(1, 1, 1) translateY(-50%)',
-    WebkitPerspective: 1000,
-    isolation: 'isolate' as const
-  }
-
   const handleWheel = (event: WheelEvent) => {
     event.preventDefault()
     
