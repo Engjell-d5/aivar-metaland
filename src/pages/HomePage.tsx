@@ -22,8 +22,9 @@ const HomePage = () => {
     exit: {
       opacity: 0,
       scale: 0.98,
+      filter: 'blur(0px)',
       transition: {
-        duration: 0.3,
+        duration: 0.2,
         ease: "easeOut"
       }
     },
@@ -31,23 +32,44 @@ const HomePage = () => {
     enter: (direction: number) => ({
       y: direction > 0 ? '100vh' : '-100vh',
       opacity: 1,
-      scale: 1.02
+      scale: 1.02,
+      filter: 'blur(0px)'
     }),
     // Row in view
     center: {
       y: 0,
       opacity: 1,
       scale: 1,
+      filter: 'blur(0px)',
       transition: {
-        type: "spring",
-        stiffness: 250,
-        damping: 20,
-        mass: 0.8,
-        bounce: 0.25,
-        restDelta: 0.01,
-        duration: 0.8
+        y: {
+          type: "spring",
+          stiffness: 100,   // Increased stiffness for faster movement
+          damping: 20,      // Kept balanced damping
+          mass: 0.8,        // Slightly reduced mass for faster movement
+          bounce: 0.2,
+          duration: 0.8     // Reduced duration
+        },
+        opacity: {
+          duration: 0.2     // Kept quick fade in
+        },
+        scale: {
+          duration: 0.2     // Kept quick scale change
+        }
       }
     }
+  }
+
+  // GPU optimization styles
+  const gpuStyles = {
+    willChange: 'transform, opacity',
+    backfaceVisibility: 'hidden' as const,
+    WebkitFontSmoothing: 'antialiased',
+    WebkitBackfaceVisibility: 'hidden' as const,
+    WebkitTransform: 'translateZ(0) scale3d(1, 1, 1)',
+    transform: 'translateZ(0) scale3d(1, 1, 1)',
+    WebkitPerspective: 1000,
+    isolation: 'isolate' as const
   }
 
   const handleWheel = (event: WheelEvent) => {
@@ -111,7 +133,7 @@ const HomePage = () => {
   // Row content data
   const rows = [
     // First row
-    <div className="flex gap-8 justify-center" key="row1">
+    <motion.div className="flex gap-8 justify-center" key="row1" style={gpuStyles}>
       <Tile
         title="AI SHARING"
         iconPath="/images/logo1.png"
@@ -126,9 +148,9 @@ const HomePage = () => {
         top="0px"
         right='0px'
       />
-    </div>,
+    </motion.div>,
     // Second row
-    <div className="flex gap-8 justify-center" key="row2">
+    <motion.div className="flex gap-8 justify-center" key="row2" style={gpuStyles}>
       <Tile
         title="AIVAR METALAND"
         iconPath="/images/logo3.png"
@@ -143,9 +165,9 @@ const HomePage = () => {
         top="0px"
         right='0px'
       />
-    </div>,
+    </motion.div>,
     // Last row
-    <div className="flex justify-center w-full max-w-[600px] mx-auto" key="row3">
+    <motion.div className="flex justify-center w-full max-w-[600px] mx-auto" key="row3" style={gpuStyles}>
       <Tile
         title="VAFFA GAME"
         iconPath="/images/logo5.png"
@@ -153,12 +175,12 @@ const HomePage = () => {
         top="0px"
         right='0px'
       />
-    </div>
+    </motion.div>
   ]
 
   return (
-    <div className="w-full h-screen overflow-hidden">
-      <div className="content-container">
+    <div className="w-full h-screen overflow-hidden" style={gpuStyles}>
+      <div className="content-container" style={gpuStyles}>
         {/* Spline positioned below tiles */}
         <Spline 
           className='pointer-events-none max-h-[1900px] max-w-[4600px] absolute top-[-75px] z-30' 
@@ -175,12 +197,11 @@ const HomePage = () => {
             width: '100%',
             height: 'calc(100vh - 328px)',
             perspective: '1000px',
-            willChange: 'transform',
-            backfaceVisibility: 'hidden'
+            ...gpuStyles
           }}
         >
           {/* Animation container */}
-          <div className="relative w-full h-full">
+          <div className="relative w-full h-full" style={gpuStyles}>
             <AnimatePresence
               initial={false}
               mode="wait"
@@ -195,12 +216,7 @@ const HomePage = () => {
                 animate="center"
                 exit="exit"
                 className="absolute w-full"
-                style={{
-                  willChange: 'transform, opacity',
-                  backfaceVisibility: 'hidden',
-                  WebkitFontSmoothing: 'antialiased',
-                  transform: 'translateZ(0)',
-                }}
+                style={gpuStyles}
               >
                 {rows[currentRowIndex]}
               </motion.div>
