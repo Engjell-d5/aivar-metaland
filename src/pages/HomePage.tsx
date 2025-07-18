@@ -21,24 +21,31 @@ const HomePage = () => {
     // Current row fading out
     exit: {
       opacity: 0,
+      scale: 0.98,
       transition: {
-        duration: 0.3
+        duration: 0.3,
+        ease: "easeOut"
       }
     },
     // New row entering
     enter: (direction: number) => ({
       y: direction > 0 ? '100vh' : '-100vh',
-      opacity: 1
+      opacity: 1,
+      scale: 1.02
     }),
     // Row in view
     center: {
       y: 0,
       opacity: 1,
+      scale: 1,
       transition: {
-        duration: 0.5,
-        type: "spring" as const,
-        stiffness: 300,
-        damping: 30
+        type: "spring",
+        stiffness: 250, // Increased stiffness for less bounce
+        damping: 20,    // Increased damping for less oscillation
+        mass: 0.8,      // Reduced mass for lighter feel
+        bounce: 0.25,   // Reduced bounce
+        restDelta: 0.01,
+        duration: 0.8   // Shorter duration
       }
     }
   }
