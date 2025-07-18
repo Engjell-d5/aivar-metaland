@@ -40,12 +40,12 @@ const HomePage = () => {
       scale: 1,
       transition: {
         type: "spring",
-        stiffness: 250, // Increased stiffness for less bounce
-        damping: 20,    // Increased damping for less oscillation
-        mass: 0.8,      // Reduced mass for lighter feel
-        bounce: 0.25,   // Reduced bounce
+        stiffness: 250,
+        damping: 20,
+        mass: 0.8,
+        bounce: 0.25,
         restDelta: 0.01,
-        duration: 0.8   // Shorter duration
+        duration: 0.8
       }
     }
   }
@@ -174,7 +174,9 @@ const HomePage = () => {
             top: '60px',
             width: '100%',
             height: 'calc(100vh - 328px)',
-            perspective: '1000px'
+            perspective: '1000px',
+            willChange: 'transform',
+            backfaceVisibility: 'hidden'
           }}
         >
           {/* Animation container */}
@@ -193,6 +195,12 @@ const HomePage = () => {
                 animate="center"
                 exit="exit"
                 className="absolute w-full"
+                style={{
+                  willChange: 'transform, opacity',
+                  backfaceVisibility: 'hidden',
+                  WebkitFontSmoothing: 'antialiased',
+                  transform: 'translateZ(0)',
+                }}
               >
                 {rows[currentRowIndex]}
               </motion.div>
