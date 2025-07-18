@@ -44,17 +44,17 @@ const HomePage = () => {
       transition: {
         y: {
           type: "spring",
-          stiffness: 100,   // Increased stiffness for faster movement
-          damping: 20,      // Kept balanced damping
-          mass: 0.8,        // Slightly reduced mass for faster movement
+          stiffness: 100,
+          damping: 20,
+          mass: 0.8,
           bounce: 0.2,
-          duration: 0.8     // Reduced duration
+          duration: 0.8
         },
         opacity: {
-          duration: 0.2     // Kept quick fade in
+          duration: 0.2
         },
         scale: {
-          duration: 0.2     // Kept quick scale change
+          duration: 0.2
         }
       }
     }
@@ -68,6 +68,18 @@ const HomePage = () => {
     WebkitBackfaceVisibility: 'hidden' as const,
     WebkitTransform: 'translateZ(0) scale3d(1, 1, 1)',
     transform: 'translateZ(0) scale3d(1, 1, 1)',
+    WebkitPerspective: 1000,
+    isolation: 'isolate' as const
+  }
+
+  // GPU optimization styles with vertical centering
+  const combinedGpuStyles = {
+    willChange: 'transform, opacity',
+    backfaceVisibility: 'hidden' as const,
+    WebkitFontSmoothing: 'antialiased',
+    WebkitBackfaceVisibility: 'hidden' as const,
+    WebkitTransform: 'translateZ(0) scale3d(1, 1, 1) translateY(-50%)',
+    transform: 'translateZ(0) scale3d(1, 1, 1) translateY(-50%)',
     WebkitPerspective: 1000,
     isolation: 'isolate' as const
   }
@@ -133,48 +145,62 @@ const HomePage = () => {
   // Row content data
   const rows = [
     // First row
-    <motion.div className="flex gap-8 justify-center" key="row1" style={gpuStyles}>
-      <Tile
-        title="AI SHARING"
-        iconPath="/images/logo1.png"
-        imagePath="/images/tile1.png"
-        top="0px"
-        right='0px'
-      />
-      <Tile
-        title="AIVAR STORE"
-        iconPath="/images/logo2.png"
-        imagePath="/images/tile2.png"
-        top="0px"
-        right='0px'
-      />
+    <motion.div className="flex gap-8 justify-center items-center h-[calc(100vh-72px-250px)]" key="row1" style={gpuStyles}>
+      <div className="flex gap-8">
+        <div className="translate-y-[-150px]">
+          <Tile
+            title="AI SHARING"
+            iconPath="/images/logo1.png"
+            imagePath="/images/tile1.png"
+            top="0px"
+            right='0px'
+          />
+        </div>
+        <div className="translate-y-[-70px]">
+          <Tile
+            title="AIVAR STORE"
+            iconPath="/images/logo2.png"
+            imagePath="/images/tile2.png"
+            top="0px"
+            right='0px'
+          />
+        </div>
+      </div>
     </motion.div>,
     // Second row
-    <motion.div className="flex gap-8 justify-center" key="row2" style={gpuStyles}>
-      <Tile
-        title="AIVAR METALAND"
-        iconPath="/images/logo3.png"
-        imagePath="/images/tile3.png"
-        top="0px"
-        right='0px'
-      />
-      <Tile
-        title="CFX QUANTUM"
-        iconPath="/images/logo4.png"
-        imagePath="/images/tile4.png"
-        top="0px"
-        right='0px'
-      />
+    <motion.div className="flex gap-8 justify-center items-center h-[calc(100vh-72px-250px)]" key="row2" style={gpuStyles}>
+      <div className="flex gap-8">
+        <div className="translate-y-[-150px]">
+          <Tile
+            title="AIVAR METALAND"
+            iconPath="/images/logo3.png"
+            imagePath="/images/tile3.png"
+            top="0px"
+            right='0px'
+          />
+        </div>
+        <div className="translate-y-[-70px]">
+          <Tile
+            title="CFX QUANTUM"
+            iconPath="/images/logo4.png"
+            imagePath="/images/tile4.png"
+            top="0px"
+            right='0px'
+          />
+        </div>
+      </div>
     </motion.div>,
-    // Last row
-    <motion.div className="flex justify-center w-full max-w-[600px] mx-auto" key="row3" style={gpuStyles}>
-      <Tile
-        title="VAFFA GAME"
-        iconPath="/images/logo5.png"
-        imagePath="/images/tile5.png"
-        top="0px"
-        right='0px'
-      />
+    // Last row - single tile centered
+    <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row3" style={gpuStyles}>
+      <div className="translate-y-[-80px]">
+        <Tile
+          title="VAFFA GAME"
+          iconPath="/images/logo5.png"
+          imagePath="/images/tile5.png"
+          top="0px"
+          right='0px'
+        />
+      </div>
     </motion.div>
   ]
 
@@ -193,15 +219,15 @@ const HomePage = () => {
           id='tiles-container' 
           className="absolute inset-x-0 z-40 flex flex-col items-center px-4" 
           style={{
-            top: '60px',
+            top: '72px',
             width: '100%',
-            height: 'calc(100vh - 328px)',
+            height: 'calc(100vh - 72px - 250px)',
             perspective: '1000px',
             ...gpuStyles
           }}
         >
           {/* Animation container */}
-          <div className="relative w-full h-full" style={gpuStyles}>
+          <div className="relative w-full h-full flex items-center justify-center" style={gpuStyles}>
             <AnimatePresence
               initial={false}
               mode="wait"
@@ -215,7 +241,7 @@ const HomePage = () => {
                 initial="enter"
                 animate="center"
                 exit="exit"
-                className="absolute w-full"
+                className="absolute w-full flex items-center justify-center"
                 style={gpuStyles}
               >
                 {rows[currentRowIndex]}
