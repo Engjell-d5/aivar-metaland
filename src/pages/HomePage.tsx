@@ -18,50 +18,22 @@ const HomePage = () => {
 
   // Animation variants for rows
   const rowVariants: Variants = {
-    // Current row fading out
-    exit: {
-      opacity: 0,
-      scale: 0.98,
-      filter: 'blur(0px)',
-      y: 0,
+    // Current row slides out vertically
+    exit: (direction: number) => ({
+      y: direction > 0 ? '-100%' : '100%',
       transition: {
-        duration: 0.3,
-        ease: "easeInOut",
-        opacity: { duration: 0.2 },
-        scale: { duration: 0.2 }
+        y: { type: 'tween', ease: 'linear', duration: 0.18 }
       }
-    },
-    // New row entering
+    }),
+    // New row slides in vertically
     enter: (direction: number) => ({
-      y: direction > 0 ? '100vh' : '-100vh',
-      opacity: 0,
-      scale: 1.02,
-      filter: 'blur(0px)'
+      y: direction > 0 ? '100%' : '-100%',
     }),
     // Row in view
     center: {
       y: 0,
-      opacity: 1,
-      scale: 1,
-      filter: 'blur(0px)',
       transition: {
-        y: {
-          type: "spring",
-          stiffness: 80,
-          damping: 20,
-          mass: 0.8,
-          bounce: 0.2,
-          restDelta: 0.001,
-          restSpeed: 0.001
-        },
-        opacity: {
-          duration: 0.4,
-          ease: "easeOut"
-        },
-        scale: {
-          duration: 0.4,
-          ease: "easeOut"
-        }
+        y: { type: 'tween', ease: 'linear', duration: 0.18 }
       }
     }
   }
