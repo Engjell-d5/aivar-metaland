@@ -3,6 +3,7 @@ import Spline from '@splinetool/react-spline'
 import Tile from '../components/Tile'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Variants } from 'framer-motion'
+import { CgProfile } from 'react-icons/cg'
 import { useRef, useState, useEffect } from 'react'
 import './HomePage.css'
 import Footer from '../components/Footer'
@@ -64,37 +65,20 @@ const HomePage = () => {
 
     const isScrollingDown = scrollDelta > 0
 
-    // Handle scroll logic based on current row and direction
-    if (currentRowIndex === 0) {
-      // At first row, only allow scrolling down
-      if (isScrollingDown) {
+    // Handle scroll logic for 5 rows
+    if (isScrollingDown) {
+      if (currentRowIndex < 4) {
         setDirection(1)
         setIsAnimating(true)
         lastScrollTime.current = now
-        setCurrentRowIndex(1)
+        setCurrentRowIndex(currentRowIndex + 1)
       }
-    } 
-    else if (currentRowIndex === 1) {
-      // At second row, allow both directions
-      if (isScrollingDown) {
-        setDirection(1)
-        setIsAnimating(true)
-        lastScrollTime.current = now
-        setCurrentRowIndex(2)
-      } else {
+    } else {
+      if (currentRowIndex > 0) {
         setDirection(-1)
         setIsAnimating(true)
         lastScrollTime.current = now
-        setCurrentRowIndex(0)
-      }
-    }
-    else if (currentRowIndex === 2) {
-      // At last row, only allow scrolling up
-      if (!isScrollingDown) {
-        setDirection(-1)
-        setIsAnimating(true)
-        lastScrollTime.current = now
-        setCurrentRowIndex(1)
+        setCurrentRowIndex(currentRowIndex - 1)
       }
     }
   }
@@ -109,9 +93,24 @@ const HomePage = () => {
     }
   }, [currentRowIndex, isAnimating])
 
+  const handleSignUp = () => {
+    // Placeholder for sign-up logic
+    console.log('Sign Up button clicked')
+  }
   // Row content data
   const rows = [
-    // First row
+    <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row4" style={gpuStyles}>
+      <div className="p-5" style={{ marginTop: '-10%' }}>
+        <span style={{
+          color: '#FFF',
+          fontFamily: 'Figtree, sans-serif',
+          fontSize: '64px',
+          fontStyle: 'normal',
+          fontWeight: 700,
+          lineHeight: 'normal',
+        }}>AI Sharing Community</span>
+      </div>
+    </motion.div>,
     <motion.div className="flex gap-8 justify-center items-center h-[calc(100vh-72px-250px)]" key="row1" style={gpuStyles}>
       <div className="flex gap-8">
         <div className="p-5 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_-0.25))]">
@@ -134,7 +133,6 @@ const HomePage = () => {
         </div>
       </div>
     </motion.div>,
-    // Second row
     <motion.div className="flex gap-8 justify-center items-center h-[calc(100vh-72px-250px)]" key="row2" style={gpuStyles}>
       <div className="flex gap-8">
         <div className="p-5 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_-0.25))]">
@@ -157,16 +155,65 @@ const HomePage = () => {
         </div>
       </div>
     </motion.div>,
-    // Last row - single tile centered
     <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row3" style={gpuStyles}>
-      <div className="p-5 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_-0.2))]">
-        <Tile
-          title="VAFFA GAME"
-          iconPath="/images/logo5.png"
-          imagePath="/images/tile5.png"
-          top="0px"
-          right='0px'
-        />
+      <div>
+        <div className="p-5 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_-0.2))]">
+          <Tile
+            title="VAFFA GAME"
+            iconPath="/images/logo5.png"
+            imagePath="/images/tile5.png"
+            top="0px"
+            right='0px'
+          />
+        </div>
+      </div>
+    </motion.div>,
+   
+    // Fifth row - placeholder
+    <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row5" style={gpuStyles}>
+      <div className="p-5" style={{ marginTop: '-10%', textAlign: 'center' }}>
+        <span style={{
+          color: '#FFF',
+          fontFamily: 'Figtree',
+          fontSize: '40px',
+          fontStyle: 'normal',
+          fontWeight: 400,
+          lineHeight: 'normal',
+        }}>
+          <b>Entra nella community</b> che sta ridefinendo <br /> il <b>futuro dell'AI</b>: condividi conoscenze, <br />
+          costruisci connessioni, <b>trasforma le tue</b> <br /> <b>idee in realtà.</b>
+        </span>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', marginTop: '32px' }}>
+          <button
+            onClick={handleSignUp}
+            style={{
+              background: '#fff',
+              color: '#2563eb',
+              fontFamily: 'Figtree, sans-serif',
+              fontWeight: 700,
+              fontSize: '1.25rem',
+              borderRadius: '9999px',
+              padding: '12px 32px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              outline: 'none',
+              transition: 'box-shadow 0.2s',
+            }}
+          >
+            Registrati
+            <CgProfile 
+              color="#004FF8"
+              size={22}
+              className="login-button-icon"
+            />
+            {/* <CgProfile color="#2563eb" size={22} style={{ marginLeft: '4px' }} /> */}
+          </button>
+        </div>
+        
       </div>
     </motion.div>
   ]
