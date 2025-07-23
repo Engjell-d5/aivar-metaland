@@ -23,7 +23,7 @@ const HomePage = () => {
     exit: (direction: number) => ({
       y: direction > 0 ? '-100%' : '100%',
       transition: {
-        y: { type: 'tween', ease: 'linear', duration: 0.18 }
+        y: { type: 'tween', ease: 'linear', duration: 0.12 }
       }
     }),
     // New row slides in vertically
@@ -34,7 +34,7 @@ const HomePage = () => {
     center: {
       y: 0,
       transition: {
-        y: { type: 'tween', ease: 'linear', duration: 0.18 }
+        y: { type: 'tween', ease: 'linear', duration: 0.12 }
       }
     }
   }
