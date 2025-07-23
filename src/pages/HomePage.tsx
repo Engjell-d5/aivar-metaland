@@ -19,22 +19,17 @@ const HomePage = () => {
 
   // Animation variants for rows
   const rowVariants: Variants = {
-    // Current row slides out vertically
     exit: (direction: number) => ({
       y: direction > 0 ? '-100%' : '100%',
-      transition: {
-        y: { type: 'tween', ease: 'linear', duration: 0.22 }
-      }
+      transition: { type: 'tween', ease: [0.1, 0.69, 0.88, 0.77], duration: 0.2 }
     }),
-    // New row slides in vertically
     enter: (direction: number) => ({
       y: direction > 0 ? '100%' : '-100%',
     }),
-    // Row in view
     center: {
       y: 0,
       transition: {
-        y: { type: 'tween', ease: 'linear', duration: 0.22 }
+        y: { type: 'tween', ease: [0.5, 0.5, 0.88, 0.87], duration: 0.2 }
       }
     }
   }
