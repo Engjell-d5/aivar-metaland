@@ -1,5 +1,3 @@
-/* NavBar Component Styles */
-
 .navbar-container {
   display: flex;
   justify-content: space-between;
@@ -14,7 +12,7 @@
   box-sizing: border-box;
   transform: translateZ(0);
   will-change: transform;
-  overflow: hidden;
+  /* overflow: hidden; */ /* Remove this line */
   isolation: isolate;
   contain: strict;
   clip: rect(0, 100vw, 72px, 0);
@@ -223,14 +221,16 @@
   }
 }
 
-/* Ensure mobile menu appears above but doesn't affect container height */
+
+/* ... other styles ... */
+
 .mobile-menu-overlay {
   position: fixed;
   top: 72px;
   left: 0;
   width: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 40;
+  z-index: 100; /* Increase the z-index */
 }
 
 .mobile-menu-content {
@@ -263,6 +263,11 @@
 
 .mobile-menu-item:hover {
   color: #E6EDFE;
+}
+
+.mobile-menu-item.mobile-menu-section:hover {
+  color: #949495 !important;
+  cursor: default;
 }
 
 .mobile-menu-section {
