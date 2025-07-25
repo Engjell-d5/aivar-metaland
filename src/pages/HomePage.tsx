@@ -7,6 +7,7 @@ import { CgProfile } from 'react-icons/cg'
 import { useRef, useState, useEffect } from 'react'
 import './HomePage.css'
 import Footer from '../components/Footer'
+import { useMediaQuery } from 'react-responsive';
 
 const HomePage = () => {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -16,6 +17,7 @@ const HomePage = () => {
   const lastScrollTime = useRef(Date.now())
   const scrollThreshold = 50
   const scrollCooldown = 800
+  const isMobile = useMediaQuery({ maxWidth: 639 });
 
   // Animation variants for rows
   const rowVariants: Variants = {
@@ -93,125 +95,102 @@ const HomePage = () => {
     console.log('Sign Up button clicked')
   }
   // Row content data
-  const rows = [
-    <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row4" style={gpuStyles}>
-      <div className="p-5" style={{ marginTop: '-10%' }}>
-        <span style={{
-          color: '#FFF',
-          fontFamily: 'Figtree, sans-serif',
-          fontSize: '64px',
-          fontStyle: 'normal',
-          fontWeight: 700,
-          lineHeight: 'normal',
-        }}>AI Sharing Community</span>
-      </div>
-    </motion.div>,
-    <motion.div className="flex gap-8 justify-center items-center h-[calc(100vh-72px-250px)]" key="row1" style={gpuStyles}>
-      <div className="flex gap-8">
-        <div className="p-5 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_-0.25))]">
-          <Tile
-            title="AI SHARING"
-            iconPath="/images/logo1.png"
-            imagePath="/images/tile1.png"
-            top="0px"
-            right='0px'
-          />
-        </div>
-        <div className="p-5 pb-8 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_0.01))]">
-          <Tile
-            title="AIVAR STORE"
-            iconPath="/images/logo2.png"
-            imagePath="/images/tile2.png"
-            top="0px"
-            right='0px'
-          />
-        </div>
-      </div>
-    </motion.div>,
-    <motion.div className="flex gap-8 justify-center items-center h-[calc(100vh-72px-250px)]" key="row2" style={gpuStyles}>
-      <div className="flex gap-8">
-        <div className="p-5 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_-0.25))]">
-          <Tile
-            title="AIVAR METALAND"
-            iconPath="/images/logo3.png"
-            imagePath="/images/tile3.png"
-            top="0px"
-            right='0px'
-          />
-        </div>
-        <div className="p-5 pb-8 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_0.01))]">
-          <Tile
-            title="CFX QUANTUM"
-            iconPath="/images/logo4.png"
-            imagePath="/images/tile4.png"
-            top="0px"
-            right='0px'
-          />
-        </div>
-      </div>
-    </motion.div>,
-    <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row3" style={gpuStyles}>
-      <div>
-        <div className="p-5 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_-0.2))]">
-          <Tile
-            title="VAFFA GAME"
-            iconPath="/images/logo5.png"
-            imagePath="/images/tile5.png"
-            top="0px"
-            right='0px'
-          />
-        </div>
-      </div>
-    </motion.div>,
-   
-    // Fifth row - placeholder
-    <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row5" style={gpuStyles}>
-      <div className="p-5" style={{ marginTop: '-10%', textAlign: 'center' }}>
-        <span style={{
-          color: '#FFF',
-          fontFamily: 'Figtree',
-          fontSize: '40px',
-          fontStyle: 'normal',
-          fontWeight: 400,
-          lineHeight: 'normal',
-        }}>
-          <b>Entra nella community</b> che sta ridefinendo <br /> il <b>futuro dell'AI</b>: condividi conoscenze, <br />
-          costruisci connessioni, <b>trasforma le tue</b> <br /> <b>idee in realtà.</b>
-        </span>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', marginTop: '32px' }}>
-          <button
-            onClick={handleSignUp}
-            style={{
-              background: '#fff',
-              color: '#2563eb',
-              fontFamily: 'Figtree, sans-serif',
-              fontWeight: 700,
-              fontSize: '1.25rem',
-              borderRadius: '9999px',
-              padding: '12px 32px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              outline: 'none',
-              transition: 'box-shadow 0.2s',
-            }}
-          >
-            Registrati
-            <CgProfile 
-              color="#004FF8"
-              size={22}
-              className="login-button-icon"
-            />
-            {/* <CgProfile color="#2563eb" size={22} style={{ marginLeft: '4px' }} /> */}
-          </button>
-        </div>
-        
-      </div>
-    </motion.div>
-  ]
+  const rows = isMobile
+    ? [
+        <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row1m" style={gpuStyles}>
+          <div className="p-5">
+            <Tile title="AI SHARING" iconPath="/images/logo1.png" imagePath="/images/tile1.png" />
+          </div>
+        </motion.div>,
+        <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row2m" style={gpuStyles}>
+          <div className="p-5">
+            <Tile title="AIVAR STORE" iconPath="/images/logo2.png" imagePath="/images/tile2.png" />
+          </div>
+        </motion.div>,
+        <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row3m" style={gpuStyles}>
+          <div className="p-5">
+            <Tile title="AIVAR METALAND" iconPath="/images/logo3.png" imagePath="/images/tile3.png" />
+          </div>
+        </motion.div>,
+        <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row4m" style={gpuStyles}>
+          <div className="p-5">
+            <Tile title="CFX QUANTUM" iconPath="/images/logo4.png" imagePath="/images/tile4.png" />
+          </div>
+        </motion.div>,
+        <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row5m" style={gpuStyles}>
+          <div className="p-5">
+            <Tile title="VAFFA GAME" iconPath="/images/logo5.png" imagePath="/images/tile5.png" />
+          </div>
+        </motion.div>,
+        <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row6m" style={gpuStyles}>
+          <div className="p-5" style={{ marginTop: '-10%', textAlign: 'center' }}>
+            <span style={{ color: '#FFF', fontFamily: 'Figtree', fontSize: '40px', fontStyle: 'normal', fontWeight: 400, lineHeight: 'normal' }}>
+              <b>Entra nella community</b> che sta ridefinendo <br /> il <b>futuro dell'AI</b>: condividi conoscenze, <br />
+              costruisci connessioni, <b>trasforma le tue</b> <br /> <b>idee in realtà.</b>
+            </span>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', marginTop: '32px' }}>
+              <button
+                onClick={handleSignUp}
+                style={{ background: '#fff', color: '#2563eb', fontFamily: 'Figtree, sans-serif', fontWeight: 700, fontSize: '1.25rem', borderRadius: '9999px', padding: '12px 32px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', outline: 'none', transition: 'box-shadow 0.2s' }}
+              >
+                Registrati
+                <CgProfile color="#004FF8" size={22} className="login-button-icon" />
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      ]
+    : [
+        <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row4" style={gpuStyles}>
+          <div className="p-5" style={{ marginTop: '-10%' }}>
+            <span style={{ color: '#FFF', fontFamily: 'Figtree, sans-serif', fontSize: '64px', fontStyle: 'normal', fontWeight: 700, lineHeight: 'normal' }}>AI Sharing Community</span>
+          </div>
+        </motion.div>,
+        <motion.div className="flex gap-8 justify-center items-center h-[calc(100vh-72px-250px)]" key="row1" style={gpuStyles}>
+          <div className="flex gap-8">
+            <div className="p-5 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_-0.25))]">
+              <Tile title="AI SHARING" iconPath="/images/logo1.png" imagePath="/images/tile1.png" />
+            </div>
+            <div className="p-5 pb-8 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_0.01))]">
+              <Tile title="AIVAR STORE" iconPath="/images/logo2.png" imagePath="/images/tile2.png" />
+            </div>
+          </div>
+        </motion.div>,
+        <motion.div className="flex gap-8 justify-center items-center h-[calc(100vh-72px-250px)]" key="row2" style={gpuStyles}>
+          <div className="flex gap-8">
+            <div className="p-5 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_-0.25))]">
+              <Tile title="AIVAR METALAND" iconPath="/images/logo3.png" imagePath="/images/tile3.png" />
+            </div>
+            <div className="p-5 pb-8 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_0.01))]">
+              <Tile title="CFX QUANTUM" iconPath="/images/logo4.png" imagePath="/images/tile4.png" />
+            </div>
+          </div>
+        </motion.div>,
+        <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row3" style={gpuStyles}>
+          <div>
+            <div className="p-5 translate-y-[calc((((100vh_-_72px_-_250px)_-_300px)_*_-0.2))]">
+              <Tile title="VAFFA GAME" iconPath="/images/logo5.png" imagePath="/images/tile5.png" />
+            </div>
+          </div>
+        </motion.div>,
+        <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row5" style={gpuStyles}>
+          <div className="p-5" style={{ marginTop: '-10%', textAlign: 'center' }}>
+            <span style={{ color: '#FFF', fontFamily: 'Figtree', fontSize: '40px', fontStyle: 'normal', fontWeight: 400, lineHeight: 'normal' }}>
+              <b>Entra nella community</b> che sta ridefinendo <br /> il <b>futuro dell'AI</b>: condividi conoscenze, <br />
+              costruisci connessioni, <b>trasforma le tue</b> <br /> <b>idee in realtà.</b>
+            </span>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', marginTop: '32px' }}>
+              <button
+                onClick={handleSignUp}
+                style={{ background: '#fff', color: '#2563eb', fontFamily: 'Figtree, sans-serif', fontWeight: 700, fontSize: '1.25rem', borderRadius: '9999px', padding: '12px 32px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', outline: 'none', transition: 'box-shadow 0.2s' }}
+              >
+                Registrati
+                <CgProfile color="#004FF8" size={22} className="login-button-icon" />
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      ];
 
   return (
     <div className="w-full h-screen overflow-hidden" style={gpuStyles}>
