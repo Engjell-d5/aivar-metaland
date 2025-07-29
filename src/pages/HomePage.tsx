@@ -31,7 +31,10 @@ const HomePage = () => {
     center: {
       y: 0,
       transition: {
-        y: { type: 'tween', ease: [0.5, 0.5, 0.88, 0.87], duration: 0.2 }
+        type: 'spring',
+        stiffness: 120,
+        damping: 18,
+        mass: 0.7,
       }
     }
   }

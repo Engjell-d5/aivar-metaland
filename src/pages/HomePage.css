@@ -93,4 +93,29 @@
 * {
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
+}
+
+@media (max-width: 639px) {
+  .content-container {
+    position: static !important;
+    overflow: visible !important;
+  }
+  #tiles-container {
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+    min-height: calc(100vh - 56px - 160px) !important;
+    height: calc(100vh - 56px - 160px) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+  .tile-root {
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 } 
