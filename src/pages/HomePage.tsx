@@ -24,10 +24,10 @@ const HomePage = () => {
   const scrollCooldown = 800
   const isMobile = useMediaQuery({ maxWidth: 639 });
   
-  // Only load Spline on desktop and when needed
+  // Load Spline on both desktop and mobile
   const shouldLoadSpline = useMemo(() => {
-    return !isMobile && window.innerWidth > 1024
-  }, [isMobile])
+    return true
+  }, [])
 
   // Memoize animation variants to prevent recreation on every render
   const rowVariants: Variants = useMemo(() => ({
@@ -316,10 +316,21 @@ const HomePage = () => {
         {/* Main content (tile) */}
         <div 
           ref={containerRef}
-          className="flex-1 flex flex-col items-center justify-center px-4" 
+          className="flex-1 flex flex-col items-center justify-center px-4 relative" 
           id="tiles-container"
         >
-          <div className="relative w-full h-full flex items-center justify-center" style={gpuStyles}>
+          {/* Spline animation background for mobile */}
+          {shouldLoadSpline && (
+            <Suspense fallback={<div className="w-full h-full bg-black" />}>
+              <ErrorBoundary fallback={<div className="w-full h-full bg-black" />}>
+                <Spline 
+                  className='pointer-events-none max-h-[1900px] max-w-[4600px] absolute top-[-75px] z-0 opacity-50' 
+                  scene="https://prod.spline.design/U4pluEHM1r2eie-d/scene.splinecode"
+                />
+              </ErrorBoundary>
+            </Suspense>
+          )}
+          <div className="relative w-full h-full flex items-center justify-center z-10" style={gpuStyles}>
             <AnimatePresence
               initial={true}
               mode="wait"
