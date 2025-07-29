@@ -2,6 +2,7 @@ import { CgProfile } from 'react-icons/cg'
 import logo from '../assets/Logo.png'
 import { useState, useRef, useEffect } from 'react'
 import axios from 'axios'
+import { motion, AnimatePresence } from 'framer-motion'
 import './NavBar.css'
 
 function NavBar() {
@@ -172,35 +173,145 @@ function NavBar() {
         </button>
       </div>
       <button onClick={() => setMenuModal(!menuModal)} className="mobile-menu-button">
-        {menuModal ? (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M6 6L18 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M6 18L18 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 50 50">
-            <path fill="white" d="M 5 8 A 2.0002 2.0002 0 1 0 5 12 L 45 12 A 2.0002 2.0002 0 1 0 45 8 L 5 8 z M 5 23 A 2.0002 2.0002 0 1 0 5 27 L 45 27 A 2.0002 2.0002 0 1 0 45 23 L 5 23 z M 5 38 A 2.0002 2.0002 0 1 0 5 42 L 45 42 A 2.0002 2.0002 0 1 0 45 38 L 5 38 z" />
-          </svg>
-        )}
-      </button>
-      {menuModal && (
-        <div className="mobile-menu-overlay">
-          <div className="mobile-menu-content">
-            <div className="mobile-menu-items">
-              <span className="mobile-menu-item">Login</span>
-              <span className="mobile-menu-item">Sign Up</span>
-              <div className="mobile-menu-divider" />
-              <span className="mobile-menu-item mobile-menu-section">Language</span>
-              <span className="mobile-menu-item" onClick={() => handleLanguageSelect('English')}>English</span>
-              <span className="mobile-menu-item" onClick={() => handleLanguageSelect('Spanish')}>Spanish</span>
-              <span className="mobile-menu-item" onClick={() => handleLanguageSelect('Italian')}>Italian</span>
-              <div className="mobile-menu-divider" />
-              <span className="mobile-menu-item mobile-menu-section">Try for free</span>
-              <span className="mobile-menu-item">Space Station</span>
-            </div>
-          </div>
+        <div className="relative w-full h-full flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 1, scale: 1 }}
+            animate={{ 
+              opacity: menuModal ? 0 : 1, 
+              scale: menuModal ? 0.8 : 1 
+            }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <svg width="24" height="24" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill="white" d="M 5 8 A 2.0002 2.0002 0 1 0 5 12 L 45 12 A 2.0002 2.0002 0 1 0 45 8 L 5 8 z M 5 23 A 2.0002 2.0002 0 1 0 5 27 L 45 27 A 2.0002 2.0002 0 1 0 45 23 L 5 23 z M 5 38 A 2.0002 2.0002 0 1 0 5 42 L 45 42 A 2.0002 2.0002 0 1 0 45 38 L 5 38 z" />
+            </svg>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ 
+              opacity: menuModal ? 1 : 0, 
+              scale: menuModal ? 1 : 0.8 
+            }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 6L18 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M6 18L18 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </motion.div>
         </div>
-      )}
+      </button>
+      <AnimatePresence>
+        {menuModal && (
+          <motion.div 
+            className="mobile-menu-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <motion.div 
+              className="mobile-menu-content"
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ 
+                duration: 0.3,
+                ease: "easeOut"
+              }}
+            >
+              <motion.div 
+                className="mobile-menu-items"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1, duration: 0.2 }}
+              >
+                <motion.span 
+                  className="mobile-menu-item"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.15, duration: 0.2 }}
+                >
+                  Login
+                </motion.span>
+                <motion.span 
+                  className="mobile-menu-item"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2, duration: 0.2 }}
+                >
+                  Sign Up
+                </motion.span>
+                <motion.div 
+                  className="mobile-menu-divider"
+                  initial={{ opacity: 0, scaleX: 0 }}
+                  animate={{ opacity: 1, scaleX: 1 }}
+                  transition={{ delay: 0.25, duration: 0.3 }}
+                />
+                <motion.span 
+                  className="mobile-menu-item mobile-menu-section"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3, duration: 0.2 }}
+                >
+                  Language
+                </motion.span>
+                <motion.span 
+                  className="mobile-menu-item"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.35, duration: 0.2 }}
+                  onClick={() => handleLanguageSelect('English')}
+                >
+                  English
+                </motion.span>
+                <motion.span 
+                  className="mobile-menu-item"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4, duration: 0.2 }}
+                  onClick={() => handleLanguageSelect('Spanish')}
+                >
+                  Spanish
+                </motion.span>
+                <motion.span 
+                  className="mobile-menu-item"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.45, duration: 0.2 }}
+                  onClick={() => handleLanguageSelect('Italian')}
+                >
+                  Italian
+                </motion.span>
+                <motion.div 
+                  className="mobile-menu-divider"
+                  initial={{ opacity: 0, scaleX: 0 }}
+                  animate={{ opacity: 1, scaleX: 1 }}
+                  transition={{ delay: 0.5, duration: 0.3 }}
+                />
+                <motion.span 
+                  className="mobile-menu-item mobile-menu-section"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.55, duration: 0.2 }}
+                >
+                  Try for free
+                </motion.span>
+                <motion.span 
+                  className="mobile-menu-item"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.6, duration: 0.2 }}
+                >
+                  Space Station
+                </motion.span>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
