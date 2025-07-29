@@ -22,8 +22,15 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
-    sourcemap: true,
+    sourcemap: false, // Disable sourcemaps in production for better performance
     emptyOutDir: true,
+    minify: 'terser', // Use terser for better minification
+    terserOptions: {
+      compress: {
+        drop_console: true, // Remove console.logs in production
+        drop_debugger: true,
+      },
+    },
     rollupOptions: {
       output: {
         // Ensure proper MIME types by using standard file extensions
@@ -38,10 +45,32 @@ export default defineConfig({
             'react-router-dom',
             'framer-motion'
           ],
-          'spline': ['@splinetool/react-spline', '@splinetool/runtime']
+          'spline': ['@splinetool/react-spline', '@splinetool/runtime'],
+          'chat': ['@11labs/react'],
+          'utils': ['axios', 'react-responsive', 'react-icons']
         }
       }
-    }
+    },
+    // Enable CSS code splitting
+    cssCodeSplit: true,
+    // Optimize dependencies
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
+  },
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      'framer-motion',
+      '@splinetool/react-spline',
+      '@11labs/react',
+      'axios',
+      'react-responsive',
+      'react-icons'
+    ],
+    exclude: ['@splinetool/runtime'] // Exclude heavy runtime from pre-bundling
   },
   server: {
     port: 3000,

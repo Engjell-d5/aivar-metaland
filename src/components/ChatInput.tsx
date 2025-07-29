@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { useConversation } from '@11labs/react'
 import './ChatInput.css'
 
@@ -15,23 +15,15 @@ const ChatInput = () => {
   const [error, setError] = useState<string | null>(null)
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    return () => {
-      // Cleanup function for component unmount
-    }
-  }, [])
-
-  const conversation = useConversation({
+  // Memoize the conversation configuration
+  const conversationConfig = useMemo(() => ({
     onConnect: () => {
-      debugger
       console.log('Connected to ElevenLabs agent')
       setError(null)
     },
     
     onDisconnect: () => {
-      debugger
       console.log('Disconnected from ElevenLabs agent')
-      //setIsVoiceActive(false)
     },
     
     onMessage: (message: { 
@@ -42,7 +34,6 @@ const ChatInput = () => {
       isFinal?: boolean
       [key: string]: unknown 
     }) => {
-      debugger
       console.log('Message received:', message)
       
       if (message.source && message.message) {
@@ -71,21 +62,24 @@ const ChatInput = () => {
       setError(`Voice chat error: ${err.message || 'Unknown error'}`)
       setIsVoiceActive(false)
     }   
-  })
+  }), [])
+
+  const conversation = useConversation(conversationConfig)
 
   const { status } = conversation
 
+  // Memoize the scroll to bottom effect
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
     }
   }, [chatHistory])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value)
-  }
+  }, [])
 
-  const handleErasure = () => {
+  const handleErasure = useCallback(() => {
     setChatHistory([])
     setChatModal(false)
     setInput('')
@@ -93,18 +87,18 @@ const ChatInput = () => {
       conversation.endSession()
       setIsVoiceActive(false)
     }
-  }
+  }, [isVoiceActive, conversation])
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       if (input === '') return
       setChatModal(true)
-      setChatHistory([...chatHistory, { role: 'user', content: input }])
+      setChatHistory(prev => [...prev, { role: 'user', content: input }])
       setInput('')
     }
-  }
+  }, [input])
 
-  const toggleVoiceChat = async () => {
+  const toggleVoiceChat = useCallback(async () => {
     if (!isVoiceActive) {
       try {
         const agentId = import.meta.env.VITE_ELEVENLABS_AGENT_ID
@@ -152,7 +146,40 @@ const ChatInput = () => {
         }
       }, 2000)
     }
-  }
+  }, [isVoiceActive, conversation])
+
+  const toggleChatModal = useCallback(() => {
+    setChatModal(prev => !prev)
+  }, [])
+
+  const dismissError = useCallback(() => {
+    setError(null)
+  }, [])
+
+  // Memoize the chat history JSX to prevent recreation
+  const chatHistoryJSX = useMemo(() => (
+    chatHistory.map((chat, index) => {
+      const chatBubbleClass = chat.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'
+      const alignmentClass = chat.role === 'user' ? 'flex justify-end' : 'flex justify-start'
+      
+      return (
+        <div key={index} className={alignmentClass}>
+          <div className={chatBubbleClass}>
+            <span className={chat.role === 'user' ? 'chat-bubble-text-user' : 'chat-bubble-text-ai'}>
+              {chat.content}
+            </span>
+          </div>
+        </div>
+      )
+    })
+  ), [chatHistory])
+
+  // Memoize the voice button class
+  const voiceButtonClass = useMemo(() => {
+    if (isVoiceActive) return 'voice-button-active'
+    if (status === 'connected') return 'voice-button-connected'
+    return 'voice-button-default'
+  }, [isVoiceActive, status])
 
   return (
     <div className="chat-input-container">
@@ -160,7 +187,7 @@ const ChatInput = () => {
         {error && (
           <div className="chat-error">
             <p>{error}</p>
-            <button onClick={() => setError(null)}>
+            <button onClick={dismissError}>
               Dismiss
             </button>
           </div>
@@ -169,7 +196,7 @@ const ChatInput = () => {
         {chatHistory.length > 0 && chatModal && (
           <>
             <div className="chat-modal-close">
-              <button className="chat-close-button" onClick={() => setChatModal(false)}>
+              <button className="chat-close-button" onClick={toggleChatModal}>
                 <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 50 50">
                   <path d="M 7.71875 6.28125 L 6.28125 7.71875 L 23.5625 25 L 6.28125 42.28125 L 7.71875 43.71875 L 25 26.4375 L 42.28125 43.71875 L 43.71875 42.28125 L 26.4375 25 L 43.71875 7.71875 L 42.28125 6.28125 L 25 23.5625 Z"></path>
                 </svg>
@@ -179,27 +206,14 @@ const ChatInput = () => {
               ref={chatContainerRef}
               className="chat-history-container"
             >
-              {chatHistory.map((chat, index) => {
-                const chatBubbleClass = chat.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'
-                const alignmentClass = chat.role === 'user' ? 'flex justify-end' : 'flex justify-start'
-                
-                return (
-                  <div key={index} className={alignmentClass}>
-                    <div className={chatBubbleClass}>
-                      <span className={chat.role === 'user' ? 'chat-bubble-text-user' : 'chat-bubble-text-ai'}>
-                        {chat.content}
-                      </span>
-                    </div>
-                  </div>
-                )
-              })}
+              {chatHistoryJSX}
             </div>
           </>
         )}
         <div className="chat-controls">
           <button 
             className="chat-expand-button"
-            onClick={() => setChatModal(!chatModal)}
+            onClick={toggleChatModal}
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" id="Zoom-In-Map--Streamline-Rounded-Material" height="24" width="24">
               <path fill="#000000" d="m7.24995 17.8249 -3.150025 3.15c-0.15 0.15 -0.325 0.22085 -0.525 0.2125 -0.2 -0.00835 -0.375 -0.0875 -0.525 -0.2375 -0.15 -0.15 -0.225 -0.32915 -0.225 -0.5375 0 -0.20835 0.075 -0.3875 0.225 -0.5375l3.125025 -3.125H3.749925c-0.2125 0 -0.390585 -0.07235 -0.53425 -0.217 -0.143835 -0.1445 -0.21575 -0.32365 -0.21575 -0.5375 0 -0.21365 0.071915 -0.39135 0.21575 -0.533 0.143665 -0.14165 0.32175 -0.2125 0.53425 -0.2125h4.250025c0.2125 0 0.39065 0.07185 0.5345 0.2155 0.14365 0.14385 0.2155 0.322 0.2155 0.5345v4.25c0 0.2125 -0.07235 0.3906 -0.217 0.53425 -0.1445 0.14385 -0.3237 0.21575 -0.5375 0.21575 -0.2137 0 -0.39135 -0.0719 -0.533 -0.21575 -0.1417 -0.14365 -0.2125 -0.32175 -0.2125 -0.53425v-2.425Zm9.5 0v2.425c0 0.2125 -0.07235 0.3906 -0.217 0.53425 -0.1445 0.14385 -0.3237 0.21575 -0.5375 0.21575 -0.2137 0 -0.39135 -0.0719 -0.533 -0.21575 -0.1417 -0.14365 -0.2125 -0.32175 -0.2125 -0.53425v-4.25c0 -0.2125 0.0719 -0.39065 0.21575 -0.5345 0.14365 -0.14365 0.32175 -0.2155 0.53425 -0.2155h4.25c0.2125 0 0.39065 0.07235 0.5345 0.217 0.14365 0.1445 0.2155 0.32365 0.2155 0.5375 0 0.21365 -0.07185 0.39135 -0.2155 0.533 -0.14385 0.14165 -0.322 0.2125 -0.5345 0.2125h-2.425l3.15 3.15c0.15 0.15 0.225 0.325 0.225 0.525s-0.075 0.375 -0.225 0.525c-0.15 0.15 -0.3292 0.225 -0.5375 0.225 -0.20835 0 -0.38755 -0.075 -0.5375 -0.225l-3.15 -3.125Zm-10.575 -10.575 -3.150025 -3.15c-0.15 -0.15 -0.220835 -0.329165 -0.2125 -0.5375 0.008335 -0.20833 0.0875 -0.3875 0.2375 -0.5375 0.15 -0.15 0.329165 -0.225 0.5375 -0.225s0.3875 0.075 0.5375 0.225l3.125025 3.15v-2.425c0 -0.2125 0.0723 -0.390665 0.217 -0.5345 0.1445 -0.143665 0.32365 -0.2155 0.5375 -0.2155 0.21365 0 0.3913 0.071835 0.533 0.2155 0.14165 0.143835 0.2125 0.322 0.2125 0.5345v4.25c0 0.2125 -0.07185 0.3906 -0.2155 0.53425 -0.14385 0.14385 -0.322 0.21575 -0.5345 0.21575H3.749925c-0.2125 0 -0.390585 -0.07235 -0.53425 -0.217 -0.143835 -0.1445 -0.21575 -0.32365 -0.21575 -0.5375 0 -0.21365 0.071915 -0.39135 0.21575 -0.533 0.143665 -0.14165 0.32175 -0.2125 0.53425 -0.2125h2.425025Zm11.65 0h2.425c0.2125 0 0.39065 0.07235 0.5345 0.217 0.14365 0.1445 0.2155 0.32365 0.2155 0.5375 0 0.21365 -0.07185 0.39135 -0.2155 0.533 -0.14385 0.14165 -0.322 0.2125 -0.5345 0.2125h-4.25c-0.2125 0 -0.3906 -0.0719 -0.53425 -0.21575 -0.14385 -0.14365 -0.21575 -0.32175 -0.21575 -0.53425v-4.25c0 -0.2125 0.0723 -0.390665 0.217 -0.5345 0.1445 -0.143665 0.32365 -0.2155 0.5375 -0.2155 0.21365 0 0.3913 0.071835 0.533 0.2155 0.14165 0.143835 0.2125 0.322 0.2125 0.5345v2.425l3.17495 -3.175c0.15005 -0.15 0.3292 -0.225 0.53755 -0.225 0.2083 0 0.3875 0.075 0.5375 0.225 0.15 0.15 0.225 0.32917 0.225 0.5375 0 0.208335 -0.075 0.3875 -0.225 0.5375l-3.175 3.175Z" strokeWidth="0.5"></path>
@@ -212,13 +226,13 @@ const ChatInput = () => {
               className="chat-text-input"
               placeholder="Try Something like..." 
               value={input}
-              onChange={(e) => handleInputChange(e)}
+              onChange={handleInputChange}
               onKeyDown={handleKeyDown}
             />
             <div className="chat-input-controls">
               <button 
                 className="chat-clear-button"
-                onClick={() => handleErasure()}
+                onClick={handleErasure}
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <mask id="mask0_8_5478" style={{ maskType: 'alpha' }} maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
@@ -233,13 +247,7 @@ const ChatInput = () => {
           </div>
 
           <button 
-            className={`voice-button ${
-              isVoiceActive 
-                ? 'voice-button-active' 
-                : status === 'connected' 
-                  ? 'voice-button-connected' 
-                  : 'voice-button-default'
-            }`}
+            className={`voice-button ${voiceButtonClass}`}
             onClick={toggleVoiceChat}
             disabled={status === 'connecting'}
           >

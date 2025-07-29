@@ -1,13 +1,16 @@
 import ChatInput from '../components/ChatInput'
-import Spline from '@splinetool/react-spline'
 import Tile from '../components/Tile'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Variants } from 'framer-motion'
 import { CgProfile } from 'react-icons/cg'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react'
 import './HomePage.css'
 import Footer from '../components/Footer'
 import { useMediaQuery } from 'react-responsive';
+import ErrorBoundary from '../components/ErrorBoundary'
+
+// Lazy load the heavy Spline component
+const Spline = lazy(() => import('@splinetool/react-spline'))
 
 const HomePage = () => {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -19,11 +22,15 @@ const HomePage = () => {
   const lastScrollTime = useRef(Date.now())
   const scrollThreshold = 50
   const scrollCooldown = 800
-  const [containerHeight, setContainerHeight] = useState<string | undefined>(undefined)
   const isMobile = useMediaQuery({ maxWidth: 639 });
+  
+  // Only load Spline on desktop and when needed
+  const shouldLoadSpline = useMemo(() => {
+    return !isMobile && window.innerWidth > 1024
+  }, [isMobile])
 
-  // Animation variants for rows
-  const rowVariants: Variants = {
+  // Memoize animation variants to prevent recreation on every render
+  const rowVariants: Variants = useMemo(() => ({
     exit: (direction: number) => ({
       y: direction > 0 ? '-100%' : '100%',
       transition: { type: 'tween', ease: [0.1, 0.69, 0.88, 0.77], duration: 0.2 }
@@ -40,10 +47,10 @@ const HomePage = () => {
         mass: 0.7,
       }
     }
-  }
+  }), [])
 
-  // GPU optimization styles
-  const gpuStyles = {
+  // Memoize GPU optimization styles
+  const gpuStyles = useMemo(() => ({
     willChange: 'transform, opacity',
     backfaceVisibility: 'hidden' as const,
     WebkitFontSmoothing: 'antialiased',
@@ -53,9 +60,10 @@ const HomePage = () => {
     WebkitPerspective: 1000,
     isolation: 'isolate' as const,
     transformStyle: 'preserve-3d' as const
-  }
+  }), [])
 
-  const handleWheel = (event: WheelEvent) => {
+  // Memoize scroll handler to prevent recreation
+  const handleWheel = useCallback((event: WheelEvent) => {
     event.preventDefault()
     
     if (isAnimating) return
@@ -68,41 +76,43 @@ const HomePage = () => {
 
     const isScrollingDown = scrollDelta > 0
 
-    // Handle scroll logic for 5 rows
+    // Handle scroll logic - 7 rows for mobile, 5 rows for desktop
+    const maxRowIndex = isMobile ? 6 : 4
+    
     if (isScrollingDown) {
-      if (currentRowIndex < 4) {
+      if (currentRowIndex < maxRowIndex) {
         setDirection(1)
         setIsAnimating(true)
         lastScrollTime.current = now
-        setCurrentRowIndex(currentRowIndex + 1)
+        setCurrentRowIndex(prev => prev + 1)
       }
     } else {
       if (currentRowIndex > 0) {
         setDirection(-1)
         setIsAnimating(true)
         lastScrollTime.current = now
-        setCurrentRowIndex(currentRowIndex - 1)
+        setCurrentRowIndex(prev => prev - 1)
       }
     }
-  }
+  }, [isAnimating, currentRowIndex, scrollCooldown, scrollThreshold, isMobile])
 
   // Touch event handlers for mobile
   const touchStartY = useRef<number | null>(null)
   const touchEndY = useRef<number | null>(null)
 
-  const handleTouchStart = (event: TouchEvent) => {
+  const handleTouchStart = useCallback((event: TouchEvent) => {
     touchStartY.current = event.touches[0].clientY
-  }
+  }, [])
 
-  const handleTouchMove = (event: TouchEvent) => {
+  const handleTouchMove = useCallback((event: TouchEvent) => {
     // Only prevent default if we have a valid touch start position
     // This means the user started touching within the tiles container
     if (touchStartY.current !== null) {
       event.preventDefault()
     }
-  }
+  }, [])
 
-  const handleTouchEnd = (event: TouchEvent) => {
+  const handleTouchEnd = useCallback((event: TouchEvent) => {
     if (!touchStartY.current) return
     
     touchEndY.current = event.changedTouches[0].clientY
@@ -117,33 +127,40 @@ const HomePage = () => {
 
     const isScrollingDown = touchDiff > 0
 
-    // Handle scroll logic for 5 rows
+    // Handle scroll logic - 7 rows for mobile, 5 rows for desktop
+    const maxRowIndex = isMobile ? 6 : 4
+    
     if (isScrollingDown) {
-      if (currentRowIndex < 4) {
+      if (currentRowIndex < maxRowIndex) {
         setDirection(1)
         setIsAnimating(true)
         lastScrollTime.current = now
-        setCurrentRowIndex(currentRowIndex + 1)
+        setCurrentRowIndex(prev => prev + 1)
       }
     } else {
       if (currentRowIndex > 0) {
         setDirection(-1)
         setIsAnimating(true)
         lastScrollTime.current = now
-        setCurrentRowIndex(currentRowIndex - 1)
+        setCurrentRowIndex(prev => prev - 1)
       }
     }
     
     // Reset touch state
     touchStartY.current = null
     touchEndY.current = null
-  }
+  }, [isAnimating, currentRowIndex, scrollCooldown, scrollThreshold])
 
-  const handleTouchCancel = () => {
+  const handleTouchCancel = useCallback(() => {
     // Reset touch state if touch is cancelled
     touchStartY.current = null
     touchEndY.current = null
-  }
+  }, [])
+
+  // Memoize the onExitComplete callback
+  const handleExitComplete = useCallback(() => {
+    setIsAnimating(false)
+  }, [])
 
   useEffect(() => {
     const container = containerRef.current
@@ -168,31 +185,23 @@ const HomePage = () => {
         container.removeEventListener('touchcancel', handleTouchCancel)
       }
     }
-  }, [currentRowIndex, isAnimating, isMobile])
+  }, [handleWheel, handleTouchStart, handleTouchMove, handleTouchEnd, handleTouchCancel, isMobile])
 
-  useEffect(() => {
-    if (!isMobile) return
-    function updateHeight() {
-      const header = headerRef.current
-      const chat = chatInputRef.current
-      const windowHeight = window.innerHeight
-      const headerHeight = header ? header.offsetHeight : 56
-      const chatHeight = chat ? chat.offsetHeight : 80
-      const available = windowHeight - headerHeight - chatHeight
-      setContainerHeight(available > 0 ? `${available}px` : undefined)
-    }
-    updateHeight()
-    window.addEventListener('resize', updateHeight)
-    return () => window.removeEventListener('resize', updateHeight)
-  }, [isMobile])
 
-  const handleSignUp = () => {
+
+  const handleSignUp = useCallback(() => {
     // Placeholder for sign-up logic
     console.log('Sign Up button clicked')
-  }
-  // Row content data
-  const rows = isMobile
+  }, [])
+
+  // Memoize rows data to prevent recreation on every render
+  const rows = useMemo(() => isMobile
     ? [
+        <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row0m" style={gpuStyles}>
+          <div className="p-5" style={{ marginTop: '-10%' }}>
+            <span style={{ color: '#FFF', fontFamily: 'Figtree, sans-serif', fontSize: '40px', fontStyle: 'normal', fontWeight: 700, lineHeight: 'normal' }}>AI Sharing Community</span>
+          </div>
+        </motion.div>,
         <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row1m" style={gpuStyles}>
           <div className="p-5">
             <Tile title="AI SHARING" iconPath="/images/logo1.png" imagePath="/images/tile1.png" />
@@ -286,17 +295,23 @@ const HomePage = () => {
             </div>
           </div>
         </motion.div>
-      ];
+      ], [isMobile, gpuStyles, handleSignUp])
 
   return (
     isMobile ? (
       <div className="w-full min-h-screen flex flex-col bg-black">
         {/* Header */}
         <div ref={headerRef} className="content-container" style={gpuStyles}>
-          <Spline 
-            className='pointer-events-none max-h-[1900px] max-w-[4600px] absolute top-[-75px] z-30' 
-            scene="https://prod.spline.design/U4pluEHM1r2eie-d/scene.splinecode"
-          />
+          {shouldLoadSpline && (
+            <Suspense fallback={<div className="w-full h-full bg-black" />}>
+              <ErrorBoundary fallback={<div className="w-full h-full bg-black" />}>
+                <Spline 
+                  className='pointer-events-none max-h-[1900px] max-w-[4600px] absolute top-[-75px] z-30' 
+                  scene="https://prod.spline.design/U4pluEHM1r2eie-d/scene.splinecode"
+                />
+              </ErrorBoundary>
+            </Suspense>
+          )}
         </div>
         {/* Main content (tile) */}
         <div 
@@ -306,12 +321,10 @@ const HomePage = () => {
         >
           <div className="relative w-full h-full flex items-center justify-center" style={gpuStyles}>
             <AnimatePresence
-              initial={false}
+              initial={true}
               mode="wait"
               custom={direction}
-              onExitComplete={() => {
-                setIsAnimating(false)
-              }}
+              onExitComplete={handleExitComplete}
             >
               <motion.div
                 key={currentRowIndex}
@@ -340,10 +353,16 @@ const HomePage = () => {
     ) : (
       <div className="w-full h-screen" style={gpuStyles}>
         <div ref={headerRef} className="content-container" style={gpuStyles}>
-          <Spline 
-            className='pointer-events-none max-h-[1900px] max-w-[4600px] absolute top-[-75px] z-30' 
-            scene="https://prod.spline.design/U4pluEHM1r2eie-d/scene.splinecode"
-          />
+          {shouldLoadSpline && (
+            <Suspense fallback={<div className="w-full h-full bg-black" />}>
+              <ErrorBoundary fallback={<div className="w-full h-full bg-black" />}>
+                <Spline 
+                  className='pointer-events-none max-h-[1900px] max-w-[4600px] absolute top-[-75px] z-30' 
+                  scene="https://prod.spline.design/U4pluEHM1r2eie-d/scene.splinecode"
+                />
+              </ErrorBoundary>
+            </Suspense>
+          )}
         </div>
         <div 
           ref={containerRef}
@@ -359,12 +378,10 @@ const HomePage = () => {
         >
           <div className="relative w-full h-full flex items-center justify-center" style={gpuStyles}>
             <AnimatePresence
-              initial={false}
+              initial={true}
               mode="wait"
               custom={direction}
-              onExitComplete={() => {
-                setIsAnimating(false)
-              }}
+              onExitComplete={handleExitComplete}
             >
               <motion.div
                 key={currentRowIndex}
