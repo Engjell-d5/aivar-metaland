@@ -198,8 +198,8 @@ const HomePage = () => {
   const rows = useMemo(() => isMobile
     ? [
         <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row0m" style={gpuStyles}>
-          <div className="p-5" style={{ marginTop: '-10%' }}>
-            <span style={{ color: '#FFF', fontFamily: 'Figtree, sans-serif', fontSize: '40px', fontStyle: 'normal', fontWeight: 700, lineHeight: 'normal' }}>AI Sharing Community</span>
+          <div className="p-5" style={{ marginTop: '-10%', textAlign: 'center' }}>
+            <span style={{ color: '#FFF', fontFamily: 'Figtree, sans-serif', fontSize: '32px', fontStyle: 'normal', fontWeight: 700, lineHeight: 'normal' }}>AI Sharing Community</span>
           </div>
         </motion.div>,
         <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row1m" style={gpuStyles}>
@@ -229,7 +229,7 @@ const HomePage = () => {
         </motion.div>,
         <motion.div className="flex justify-center items-center h-[calc(100vh-72px-250px)]" key="row6m" style={gpuStyles}>
           <div className="p-5" style={{ marginTop: '-10%', textAlign: 'center' }}>
-            <span style={{ color: '#FFF', fontFamily: 'Figtree', fontSize: '40px', fontStyle: 'normal', fontWeight: 400, lineHeight: 'normal' }}>
+            <span style={{ color: '#FFF', fontFamily: 'Figtree', fontSize: '24px', fontStyle: 'normal', fontWeight: 400, lineHeight: 'normal' }}>
               <b>Entra nella community</b> che sta ridefinendo <br /> il <b>futuro dell'AI</b>: condividi conoscenze, <br />
               costruisci connessioni, <b>trasforma le tue</b> <br /> <b>idee in realtà.</b>
             </span>
