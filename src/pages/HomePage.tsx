@@ -86,15 +86,89 @@ const HomePage = () => {
     }
   }
 
+  // Touch event handlers for mobile
+  const touchStartY = useRef<number | null>(null)
+  const touchEndY = useRef<number | null>(null)
+
+  const handleTouchStart = (event: TouchEvent) => {
+    touchStartY.current = event.touches[0].clientY
+  }
+
+  const handleTouchMove = (event: TouchEvent) => {
+    // Only prevent default if we have a valid touch start position
+    // This means the user started touching within the tiles container
+    if (touchStartY.current !== null) {
+      event.preventDefault()
+    }
+  }
+
+  const handleTouchEnd = (event: TouchEvent) => {
+    if (!touchStartY.current) return
+    
+    touchEndY.current = event.changedTouches[0].clientY
+    const touchDiff = touchStartY.current - touchEndY.current
+    
+    if (isAnimating) return
+    
+    const now = Date.now()
+    if (now - lastScrollTime.current < scrollCooldown) return
+    
+    if (Math.abs(touchDiff) < scrollThreshold) return
+
+    const isScrollingDown = touchDiff > 0
+
+    // Handle scroll logic for 5 rows
+    if (isScrollingDown) {
+      if (currentRowIndex < 4) {
+        setDirection(1)
+        setIsAnimating(true)
+        lastScrollTime.current = now
+        setCurrentRowIndex(currentRowIndex + 1)
+      }
+    } else {
+      if (currentRowIndex > 0) {
+        setDirection(-1)
+        setIsAnimating(true)
+        lastScrollTime.current = now
+        setCurrentRowIndex(currentRowIndex - 1)
+      }
+    }
+    
+    // Reset touch state
+    touchStartY.current = null
+    touchEndY.current = null
+  }
+
+  const handleTouchCancel = () => {
+    // Reset touch state if touch is cancelled
+    touchStartY.current = null
+    touchEndY.current = null
+  }
+
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
 
     container.addEventListener('wheel', handleWheel, { passive: false })
+    
+    // Add touch event listeners for mobile
+    if (isMobile) {
+      container.addEventListener('touchstart', handleTouchStart, { passive: false })
+      container.addEventListener('touchmove', handleTouchMove, { passive: false })
+      container.addEventListener('touchend', handleTouchEnd, { passive: false })
+      container.addEventListener('touchcancel', handleTouchCancel, { passive: false })
+    }
+    
     return () => {
       container.removeEventListener('wheel', handleWheel)
+      if (isMobile) {
+        container.removeEventListener('touchstart', handleTouchStart)
+        container.removeEventListener('touchmove', handleTouchMove)
+        container.removeEventListener('touchend', handleTouchEnd)
+        container.removeEventListener('touchcancel', handleTouchCancel)
+      }
     }
-  }, [currentRowIndex, isAnimating])
+  }, [currentRowIndex, isAnimating, isMobile])
 
   useEffect(() => {
     if (!isMobile) return
@@ -225,7 +299,11 @@ const HomePage = () => {
           />
         </div>
         {/* Main content (tile) */}
-        <div className="flex-1 flex flex-col items-center justify-center px-4" id="tiles-container">
+        <div 
+          ref={containerRef}
+          className="flex-1 flex flex-col items-center justify-center px-4" 
+          id="tiles-container"
+        >
           <div className="relative w-full h-full flex items-center justify-center" style={gpuStyles}>
             <AnimatePresence
               initial={false}

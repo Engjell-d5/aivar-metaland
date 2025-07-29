@@ -90,13 +90,26 @@
   scrollbar-width: none !important;
 }
 
+/* Only prevent scrolling on the tiles container itself */
+@media (max-width: 639px) {
+  #tiles-container {
+    touch-action: pan-y pinch-zoom;
+  }
+}
+
+#tiles-container {
+  z-index: 0 !important;
+  touch-action: pan-y pinch-zoom;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+}
+
 @media (max-width: 639px) {
   .content-container {
     position: static !important;
     overflow: visible !important;
   }
   #tiles-container {
-    z-index: 0 !important;
     margin-bottom: 0 !important;
     margin-top: 0 !important;
     min-height: calc(100vh - 56px - 260px) !important;
@@ -105,6 +118,9 @@
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
+    touch-action: pan-y pinch-zoom !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: none !important;
   }
   .tile-root {
     margin-bottom: 0 !important;
