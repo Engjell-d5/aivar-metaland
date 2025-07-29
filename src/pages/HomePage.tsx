@@ -11,12 +11,15 @@ import { useMediaQuery } from 'react-responsive';
 
 const HomePage = () => {
   const containerRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const chatInputRef = useRef<HTMLDivElement>(null)
   const [currentRowIndex, setCurrentRowIndex] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
   const [direction, setDirection] = useState(0)
   const lastScrollTime = useRef(Date.now())
   const scrollThreshold = 50
   const scrollCooldown = 800
+  const [containerHeight, setContainerHeight] = useState<string | undefined>(undefined)
   const isMobile = useMediaQuery({ maxWidth: 639 });
 
   // Animation variants for rows
@@ -92,6 +95,22 @@ const HomePage = () => {
       container.removeEventListener('wheel', handleWheel)
     }
   }, [currentRowIndex, isAnimating])
+
+  useEffect(() => {
+    if (!isMobile) return
+    function updateHeight() {
+      const header = headerRef.current
+      const chat = chatInputRef.current
+      const windowHeight = window.innerHeight
+      const headerHeight = header ? header.offsetHeight : 56
+      const chatHeight = chat ? chat.offsetHeight : 80
+      const available = windowHeight - headerHeight - chatHeight
+      setContainerHeight(available > 0 ? `${available}px` : undefined)
+    }
+    updateHeight()
+    window.addEventListener('resize', updateHeight)
+    return () => window.removeEventListener('resize', updateHeight)
+  }, [isMobile])
 
   const handleSignUp = () => {
     // Placeholder for sign-up logic
@@ -196,28 +215,17 @@ const HomePage = () => {
       ];
 
   return (
-    <div className="w-full h-screen overflow-hidden" style={gpuStyles}>
-      <div className="content-container" style={gpuStyles}>
-        {/* Spline positioned below tiles */}
-        <Spline 
-          className='pointer-events-none max-h-[1900px] max-w-[4600px] absolute top-[-75px] z-30' 
-          scene="https://prod.spline.design/U4pluEHM1r2eie-d/scene.splinecode"
-        />
-        
-        {/* Tiles container */}
-        <div 
-          ref={containerRef}
-          id='tiles-container' 
-          className="absolute inset-x-0 z-40 flex flex-col items-center px-4" 
-          style={{
-            top: '72px',
-            width: '100%',
-            height: 'calc(100vh - 72px - 250px)', // Available space between header and chat input
-            perspective: '1000px',
-            ...gpuStyles
-          }}
-        >
-          {/* Animation container */}
+    isMobile ? (
+      <div className="w-full min-h-screen flex flex-col bg-black">
+        {/* Header */}
+        <div ref={headerRef} className="content-container" style={gpuStyles}>
+          <Spline 
+            className='pointer-events-none max-h-[1900px] max-w-[4600px] absolute top-[-75px] z-30' 
+            scene="https://prod.spline.design/U4pluEHM1r2eie-d/scene.splinecode"
+          />
+        </div>
+        {/* Main content (tile) */}
+        <div className="flex-1 flex flex-col items-center justify-center px-4" id="tiles-container">
           <div className="relative w-full h-full flex items-center justify-center" style={gpuStyles}>
             <AnimatePresence
               initial={false}
@@ -242,18 +250,67 @@ const HomePage = () => {
             </AnimatePresence>
           </div>
         </div>
+        {/* Chat input */}
+        <div className="flex-shrink-0 w-full">
+          <ChatInput />
+        </div>
+        {/* Footer */}
+        <div className="flex-shrink-0 w-full footer-mobile">
+          <Footer />
+        </div>
       </div>
-
-      {/* Fixed ChatInput */}
-      <div className="fixed-chat flex justify-center">
-        <ChatInput />
+    ) : (
+      <div className="w-full h-screen" style={gpuStyles}>
+        <div ref={headerRef} className="content-container" style={gpuStyles}>
+          <Spline 
+            className='pointer-events-none max-h-[1900px] max-w-[4600px] absolute top-[-75px] z-30' 
+            scene="https://prod.spline.design/U4pluEHM1r2eie-d/scene.splinecode"
+          />
+        </div>
+        <div 
+          ref={containerRef}
+          id='tiles-container' 
+          className="absolute inset-x-0 z-40 flex flex-col items-center px-4"
+          style={{
+            top: '72px',
+            width: '100%',
+            height: 'calc(100vh - 72px - 250px)',
+            perspective: '1000px',
+            ...gpuStyles
+          }}
+        >
+          <div className="relative w-full h-full flex items-center justify-center" style={gpuStyles}>
+            <AnimatePresence
+              initial={false}
+              mode="wait"
+              custom={direction}
+              onExitComplete={() => {
+                setIsAnimating(false)
+              }}
+            >
+              <motion.div
+                key={currentRowIndex}
+                custom={direction}
+                variants={rowVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="absolute w-full flex items-center justify-center"
+                style={gpuStyles}
+              >
+                {rows[currentRowIndex]}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+        <div ref={chatInputRef} className="fixed-chat flex justify-center">
+          <ChatInput />
+        </div>
+        <div className="fixed-footer">
+          <Footer />
+        </div>
       </div>
-
-      {/* Fixed Footer */}
-      <div className="fixed-footer">
-        <Footer />
-      </div>
-    </div>
+    )
   )
 }
 

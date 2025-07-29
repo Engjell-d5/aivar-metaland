@@ -80,11 +80,6 @@
   overflow: hidden;
 }
 
-/* Tiles container specific styles */
-#tiles-container {
-  z-index: 40 !important; /* Highest z-index */
-}
-
 /* Hide all scrollbars globally */
 ::-webkit-scrollbar {
   display: none !important;
@@ -101,10 +96,11 @@
     overflow: visible !important;
   }
   #tiles-container {
+    z-index: 0 !important;
     margin-bottom: 0 !important;
     margin-top: 0 !important;
-    min-height: calc(100vh - 56px - 160px) !important;
-    height: calc(100vh - 56px - 160px) !important;
+    min-height: calc(100vh - 56px - 260px) !important;
+    height: calc(100vh - 56px - 260px) !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
@@ -117,5 +113,38 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+  }
+  .fixed-chat {
+    position: static !important;
+    width: 100% !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    z-index: auto !important;
+    transform: none !important;
+    margin-bottom: 0 !important;
+  }
+  .fixed-footer {
+    position: static !important;
+    width: 100% !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    z-index: auto !important;
+    transform: none !important;
+  }
+  .footer-mobile {
+    width: 100% !important;
+    min-height: 160px;
+    max-height: 208px;
+    background: #262627;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    margin-top: 0 !important;
+    flex-shrink: 0;
+  }
+  .w-full.h-screen.flex.flex-col {
+    box-sizing: border-box;
   }
 } 

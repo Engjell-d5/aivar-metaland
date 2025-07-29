@@ -343,4 +343,10 @@
   }
 }
 
+@media (max-width: 639px) {
+  .chat-input-container {
+    margin-bottom: 24px !important;
+  }
+}
+
 
