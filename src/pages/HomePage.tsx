@@ -36,7 +36,7 @@ const HomePage = () => {
       transition: { type: 'tween', ease: [0.1, 0.69, 0.88, 0.77], duration: 0.2 }
     }),
     enter: (direction: number) => ({
-      y: '100%', // Always enter from below for consistent animation
+      y: direction > 0 ? '100%' : '-100%',
     }),
     center: {
       y: 0,
