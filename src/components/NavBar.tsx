@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext'
 import './NavBar.css'
 
 const NavBar = () => {
-  const { user, isAuthenticated, isLoading, login, logout, getUserInfo } = useAuth()
+  const { user, isAuthenticated, isLoading, login, logout } = useAuth()
   const [languageModal, setLanguageModal] = useState(false)
   const [menuModal, setMenuModal] = useState(false)
   const languageModalRef = useRef<HTMLDivElement>(null)

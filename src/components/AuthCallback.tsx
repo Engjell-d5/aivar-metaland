@@ -3,7 +3,6 @@ import authService from '../services/authService';
 
 const AuthCallback: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(true);
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -14,7 +13,6 @@ const AuthCallback: React.FC = () => {
       } catch (error) {
         console.error('Authentication callback error:', error);
         setError('Authentication failed. Please try again.');
-        setIsProcessing(false);
       }
     };
 

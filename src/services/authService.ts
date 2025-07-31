@@ -3,7 +3,6 @@ import { UserManager, User, WebStorageStateStore } from 'oidc-client-ts';
 // Environment-based SSO Configuration
 const getSsoConfig = () => {
   const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  const isVercel = window.location.hostname.includes('vercel.app');
   
   return {
     authority: import.meta.env.VITE_SSO_AUTHORITY || 
