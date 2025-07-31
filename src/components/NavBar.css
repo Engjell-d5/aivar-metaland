@@ -59,12 +59,13 @@
   flex-shrink: 0;
 }
 
-/* Position dropdowns using fixed positioning */
+/* Position dropdowns relative to the language button */
 .language-modal {
-  position: fixed;
-  top: 72px; /* Align with bottom of navbar */
-  left: 50%;
-  transform: translateX(-50%);
+  position: absolute;
+  top: 100%; /* Position directly under the button */
+  left: 50%; /* Center horizontally */
+  transform: translateX(-50%); /* Center the panel on the button */
+  margin-top: 8px; /* Add some spacing */
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

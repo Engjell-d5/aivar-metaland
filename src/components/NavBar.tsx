@@ -77,7 +77,7 @@ const NavBar = () => {
   // Memoize the language modal JSX to prevent recreation
   const languageModalJSX = useMemo(() => (
     languageModal && (
-      <div className="language-modal absolute top-full right-0 mt-2 !z-10">
+      <div className="language-modal">
         <div className="language-text-container">
           <div className="language-item" onClick={() => handleLanguageSelect('English')}>
             <div className="language-flag">
