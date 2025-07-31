@@ -1,22 +1,20 @@
 import { UserManager, User, WebStorageStateStore } from 'oidc-client-ts';
+import configService from './configService';
 
 // Environment-based SSO Configuration
 const getSsoConfig = () => {
-  const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const ssoConfig = configService.getSsoConfig();
   
   return {
-    authority: import.meta.env.VITE_SSO_AUTHORITY || 
-               (isDevelopment 
-                 ? 'https://auth.staging.aisharing.ai/realms/ais'
-                 : 'https://auth.production.aisharing.ai/realms/ais'),
-    client_id: import.meta.env.VITE_SSO_CLIENT_ID || 'aivarmetaland-client',
-    redirect_uri: import.meta.env.VITE_SSO_REDIRECT_URI || `${window.location.origin}/#/callback`,
-    post_logout_redirect_uri: import.meta.env.VITE_SSO_POST_LOGOUT_REDIRECT_URI || `${window.location.origin}/#/`,
+    authority: ssoConfig.authority,
+    client_id: ssoConfig.clientId,
+    redirect_uri: ssoConfig.redirectUri,
+    post_logout_redirect_uri: ssoConfig.postLogoutRedirectUri,
     response_type: 'code',
     scope: 'openid profile email',
     loadUserInfo: true,
     automaticSilentRenew: true,
-    silent_redirect_uri: import.meta.env.VITE_SSO_SILENT_REDIRECT_URI || `${window.location.origin}/silent-renew.html`,
+    silent_redirect_uri: ssoConfig.silentRedirectUri,
     stateStore: new WebStorageStateStore({ store: window.localStorage }),
   };
 };

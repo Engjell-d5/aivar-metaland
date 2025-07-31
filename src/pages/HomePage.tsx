@@ -60,10 +60,10 @@ const HomePage = () => {
           onScroll={handleScroll}
         >
           <div 
-            className="flex-1 flex flex-col items-center justify-center px-4 relative" 
-            id="tiles-container"
-          >
-            {/* Spline animation background for mobile */}
+          className="flex-1 flex flex-col items-center justify-center px-4 relative" 
+          id="tiles-container"
+        >
+          {/* Spline animation background for mobile */}
             <SplineBackground opacity={0.5} zIndex={0} />
             
             <AnimatedContent
@@ -72,8 +72,8 @@ const HomePage = () => {
               rowVariants={rowVariants}
               gpuStyles={gpuStyles}
               onExitComplete={handleExitComplete}
-            >
-              {rows[currentRowIndex]}
+              >
+                {rows[currentRowIndex]}
             </AnimatedContent>
           </div>
         </ScrollHandler>
@@ -109,24 +109,24 @@ const HomePage = () => {
           onScroll={handleScroll}
         >
           <div 
-            id='tiles-container' 
-            className="absolute inset-x-0 z-40 flex flex-col items-center px-4"
-            style={{
-              top: '72px',
-              width: '100%',
-              height: 'calc(100vh - 72px - 250px)',
-              perspective: '1000px',
-              ...gpuStyles
-            }}
-          >
+          id='tiles-container' 
+          className="absolute inset-x-0 z-40 flex flex-col items-center px-4"
+          style={{
+            top: '72px',
+            width: '100%',
+            height: 'calc(100vh - 72px - 250px)',
+            perspective: '1000px',
+            ...gpuStyles
+          }}
+        >
             <AnimatedContent
               currentRowIndex={currentRowIndex}
               direction={direction}
               rowVariants={rowVariants}
               gpuStyles={gpuStyles}
               onExitComplete={handleExitComplete}
-            >
-              {rows[currentRowIndex]}
+              >
+                {rows[currentRowIndex]}
             </AnimatedContent>
           </div>
         </ScrollHandler>

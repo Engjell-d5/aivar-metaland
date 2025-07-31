@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { useConversation } from '@11labs/react'
+import configService from '../services/configService'
 import './ChatInput.css'
 
 interface ChatHistory {
@@ -101,9 +102,9 @@ const ChatInput = () => {
   const toggleVoiceChat = useCallback(async () => {
     if (!isVoiceActive) {
       try {
-        const agentId = import.meta.env.VITE_ELEVENLABS_AGENT_ID
+        const { agentId } = configService.getElevenLabsConfig()
         if (!agentId) {
-          throw new Error('ElevenLabs Agent ID not found in environment variables')
+          throw new Error('ElevenLabs Agent ID not found in configuration')
         }
         
         // Request microphone permission explicitly
