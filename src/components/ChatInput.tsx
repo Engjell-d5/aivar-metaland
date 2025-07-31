@@ -57,9 +57,9 @@ const ChatInput = () => {
       }
     },
     
-    onError: (err: any) => {
-      console.error('Error during conversation:', err)
-      setError(`Voice chat error: ${err.message || 'Unknown error'}`)
+    onError: (message: string, context?: unknown) => {
+      console.error('Error during conversation:', message, context)
+      setError(`Voice chat error: ${message}`)
       setIsVoiceActive(false)
     }   
   }), [])

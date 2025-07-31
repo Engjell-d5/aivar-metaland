@@ -9,7 +9,7 @@ import Footer from '../components/Footer'
 import { useMediaQuery } from 'react-responsive';
 import ErrorBoundary from '../components/ErrorBoundary'
 import UserProfile from '../components/UserProfile'
-import { useAuth } from '../contexts/AuthContext'
+import { useAuth } from '../hooks/useAuth'
 
 // Lazy load the heavy Spline component
 const Spline = lazy(() => import('@splinetool/react-spline'))

@@ -2,7 +2,7 @@ import { CgProfile } from 'react-icons/cg'
 import logo from '../assets/Logo.png'
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useAuth } from '../contexts/AuthContext'
+import { useAuth } from '../hooks/useAuth'
 import './NavBar.css'
 
 const NavBar = () => {
