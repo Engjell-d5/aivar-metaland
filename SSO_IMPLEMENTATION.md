@@ -77,22 +77,40 @@ Click the "Logout" button in the navigation bar or the logout button in the user
 
 ## Configuration
 
-The SSO configuration is defined in `src/services/authService.ts`:
+The SSO configuration is defined in `src/services/authService.ts` and supports environment variables:
 
 ```typescript
-const ssoConfig = {
-  authority: 'https://auth.staging.aisharing.ai/realms/ais',
-  client_id: 'aivarmetaland-client',
-  redirect_uri: `${window.location.origin}/#/callback`,
-  post_logout_redirect_uri: `${window.location.origin}/#/`,
-  response_type: 'code',
-  scope: 'openid profile email',
-  loadUserInfo: true,
-  automaticSilentRenew: true,
-  silent_redirect_uri: `${window.location.origin}/silent-renew.html`,
-  stateStore: new WebStorageStateStore({ store: window.localStorage }),
+const getSsoConfig = () => {
+  const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const isVercel = window.location.hostname.includes('vercel.app');
+  
+  return {
+    authority: import.meta.env.VITE_SSO_AUTHORITY || 
+               (isDevelopment 
+                 ? 'https://auth.staging.aisharing.ai/realms/ais'
+                 : 'https://auth.production.aisharing.ai/realms/ais'),
+    client_id: import.meta.env.VITE_SSO_CLIENT_ID || 'aivarmetaland-client',
+    redirect_uri: import.meta.env.VITE_SSO_REDIRECT_URI || `${window.location.origin}/#/callback`,
+    post_logout_redirect_uri: import.meta.env.VITE_SSO_POST_LOGOUT_REDIRECT_URI || `${window.location.origin}/#/`,
+    response_type: 'code',
+    scope: 'openid profile email',
+    loadUserInfo: true,
+    automaticSilentRenew: true,
+    silent_redirect_uri: import.meta.env.VITE_SSO_SILENT_REDIRECT_URI || `${window.location.origin}/silent-renew.html`,
+    stateStore: new WebStorageStateStore({ store: window.localStorage }),
+  };
 };
 ```
+
+### Environment Variables
+
+The application supports the following environment variables:
+
+- `VITE_SSO_AUTHORITY`: SSO provider authority URL
+- `VITE_SSO_CLIENT_ID`: SSO client ID
+- `VITE_SSO_REDIRECT_URI`: Custom redirect URI (optional)
+- `VITE_SSO_POST_LOGOUT_REDIRECT_URI`: Custom post-logout redirect URI (optional)
+- `VITE_SSO_SILENT_REDIRECT_URI`: Custom silent renew redirect URI (optional)
 
 ## Security Features
 
@@ -127,10 +145,41 @@ localStorage.setItem('oidc.debug', 'true');
 
 ## Production Deployment
 
+### Vercel Deployment
+
+The application is configured for deployment on Vercel at: https://aivar-metaland-zsdj.vercel.app/
+
+#### Environment Variables Setup
+
+Add these environment variables in your Vercel dashboard:
+
+```bash
+VITE_SSO_AUTHORITY=https://auth.staging.aisharing.ai/realms/ais
+VITE_SSO_CLIENT_ID=aivarmetaland-client
+VITE_SSO_REDIRECT_URI=https://aivar-metaland-zsdj.vercel.app/#/callback
+VITE_SSO_POST_LOGOUT_REDIRECT_URI=https://aivar-metaland-zsdj.vercel.app/#/
+VITE_SSO_SILENT_REDIRECT_URI=https://aivar-metaland-zsdj.vercel.app/silent-renew.html
+```
+
+#### SSO Provider Configuration
+
+In your SSO provider admin panel, add these redirect URIs:
+
+**Valid Redirect URIs:**
+- `https://aivar-metaland-zsdj.vercel.app/#/callback`
+
+**Valid Post-Logout Redirect URIs:**
+- `https://aivar-metaland-zsdj.vercel.app/#/`
+
+**Valid Silent Renew URIs:**
+- `https://aivar-metaland-zsdj.vercel.app/silent-renew.html`
+
+### General Production Deployment
+
 Before deploying to production:
 
-1. Update the `authority` URL to your production SSO server
-2. Update `redirect_uri` and `post_logout_redirect_uri` to your production domain
+1. Update the `VITE_SSO_AUTHORITY` to your production SSO server
+2. Update redirect URIs to your production domain
 3. Ensure your SSO provider is configured for your production domain
 4. Test the complete authentication flow in production environment
 
