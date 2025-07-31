@@ -173,20 +173,24 @@
 .login-button {
   background-color: #E6EDFE;
   border-radius: 24px;
-  width: 106px;
+  min-width: 106px;
   height: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 8px;
-  padding: 16px;
+  padding: 8px 16px;
   border: none;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.login-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .login-button-text {
-  width: 42px;
-  height: 24px;
   font-family: 'Figtree', sans-serif;
   font-style: normal;
   font-weight: 600;
@@ -194,9 +198,8 @@
   line-height: 24px;
   letter-spacing: 0.02em;
   color: #004FF8;
-  flex: none;
-  order: 1;
-  flex-grow: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .login-button-icon {

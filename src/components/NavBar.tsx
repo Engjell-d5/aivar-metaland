@@ -1,11 +1,12 @@
 import { CgProfile } from 'react-icons/cg'
 import logo from '../assets/Logo.png'
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
-import axios from 'axios'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useAuth } from '../contexts/AuthContext'
 import './NavBar.css'
 
 const NavBar = () => {
+  const { user, isAuthenticated, isLoading, login, logout, getUserInfo } = useAuth()
   const [languageModal, setLanguageModal] = useState(false)
   const [menuModal, setMenuModal] = useState(false)
   const languageModalRef = useRef<HTMLDivElement>(null)
@@ -33,36 +34,19 @@ const NavBar = () => {
     setLanguageModal(false)
   }, [])
 
-  // Memoize the login handler
-  const handleLogin = useCallback(async () => {
+  // Memoize the login/logout handler
+  const handleAuthAction = useCallback(async () => {
     try {
-      console.log('Attempting to login...')
-      
-      // Replace with your actual login endpoint
-      const response = await axios.post('https://your-api.com/auth/login', {
-        email: 'user@example.com',
-        password: 'password123'
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      })
-      
-      console.log('Login successful:', response.data)
-      
-      if (response.data.token) {
-        localStorage.setItem('authToken', response.data.token)
+      if (isAuthenticated) {
+        await logout()
+      } else {
+        await login()
       }
-      
     } catch (error) {
-      console.error('Login failed:', error)
-      
-      if (axios.isAxiosError(error)) {
-        const errorMessage = error.response?.data?.message || 'Login failed'
-        alert(errorMessage) // Replace with proper error handling
-      }
+      console.error('Authentication action failed:', error)
+      alert('Authentication failed. Please try again.')
     }
-  }, [])
+  }, [isAuthenticated, login, logout])
 
   // Memoize the language modal toggle
   const toggleLanguageModal = useCallback(() => {
@@ -174,15 +158,31 @@ const NavBar = () => {
             Space Station
           </span>
         </button>
-        <button className="login-button" onClick={handleLogin}>
-          <span className="login-button-text">
-            Login
-          </span>
-          <CgProfile 
-            color="#004FF8" 
-            size={20}
-            className="login-button-icon"
-          />
+        <button 
+          className="login-button" 
+          onClick={handleAuthAction}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+          ) : (
+            <span className="login-button-text">
+              {isAuthenticated ? 'Logout' : 'Login'}
+            </span>
+          )}
+          {!isLoading && isAuthenticated && user?.profile?.picture ? (
+            <img 
+              src={user.profile.picture} 
+              alt="Profile" 
+              className="w-5 h-5 rounded-full"
+            />
+          ) : !isLoading && (
+            <CgProfile 
+              color="#004FF8" 
+              size={20}
+              className="login-button-icon"
+            />
+          )}
         </button>
       </div>
       <button onClick={toggleMenuModal} className="mobile-menu-button">
@@ -246,17 +246,27 @@ const NavBar = () => {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.15, duration: 0.2 }}
+                  onClick={isLoading ? undefined : handleAuthAction}
                 >
-                  Login
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>Loading...</span>
+                    </div>
+                  ) : (
+                    isAuthenticated ? 'Logout' : 'Login'
+                  )}
                 </motion.span>
-                <motion.span 
-                  className="mobile-menu-item"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2, duration: 0.2 }}
-                >
-                  Sign Up
-                </motion.span>
+                {isAuthenticated && user?.profile?.name && (
+                  <motion.span 
+                    className="mobile-menu-item mobile-menu-user"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2, duration: 0.2 }}
+                  >
+                    Welcome, {user.profile.name}
+                  </motion.span>
+                )}
                 <motion.div 
                   className="mobile-menu-divider"
                   initial={{ opacity: 0, scaleX: 0 }}

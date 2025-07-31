@@ -8,11 +8,14 @@ import './HomePage.css'
 import Footer from '../components/Footer'
 import { useMediaQuery } from 'react-responsive';
 import ErrorBoundary from '../components/ErrorBoundary'
+import UserProfile from '../components/UserProfile'
+import { useAuth } from '../contexts/AuthContext'
 
 // Lazy load the heavy Spline component
 const Spline = lazy(() => import('@splinetool/react-spline'))
 
 const HomePage = () => {
+  const { isAuthenticated } = useAuth()
   const containerRef = useRef<HTMLDivElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const chatInputRef = useRef<HTMLDivElement>(null)
@@ -300,6 +303,12 @@ const HomePage = () => {
   return (
     isMobile ? (
       <div className="w-full min-h-screen flex flex-col bg-black">
+        {/* User Profile Overlay */}
+        {isAuthenticated && (
+          <div className="fixed top-20 right-4 z-50">
+            <UserProfile />
+          </div>
+        )}
         {/* Header */}
         <div ref={headerRef} className="content-container" style={gpuStyles}>
           {shouldLoadSpline && (
@@ -363,6 +372,12 @@ const HomePage = () => {
       </div>
     ) : (
       <div className="w-full h-screen" style={gpuStyles}>
+        {/* User Profile Overlay */}
+        {isAuthenticated && (
+          <div className="fixed top-20 right-4 z-50">
+            <UserProfile />
+          </div>
+        )}
         <div ref={headerRef} className="content-container" style={gpuStyles}>
           {shouldLoadSpline && (
             <Suspense fallback={<div className="w-full h-full bg-black" />}>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Silent Renew</title>
+</head>
+<body>
+    <script>
+        new Promise(function (resolve, reject) {
+            if (window.parent !== window) {
+                var sendMessage = function (message) {
+                    window.parent.postMessage(message, window.location.origin);
+                };
+                var receiveMessage = function (evt) {
+                    if (evt.origin !== window.location.origin) {
+                        reject("Invalid origin");
+                        return;
+                    }
+                    if (evt.data === "loaded") {
+                        sendMessage("init");
+                    }
+                    else if (evt.data.type === "error") {
+                        reject(evt.data.error);
+                    }
+                    else if (evt.data.type === "success") {
+                        resolve(evt.data.user);
+                    }
+                };
+                window.addEventListener("message", receiveMessage, false);
+                sendMessage("loaded");
+            }
+            else {
+                reject("Not in iframe");
+            }
+        }).then(function (user) {
+            window.parent.postMessage({ type: "success", user: user }, window.location.origin);
+        }).catch(function (error) {
+            window.parent.postMessage({ type: "error", error: error.message }, window.location.origin);
+        });
+    </script>
+</body>
+</html> 
